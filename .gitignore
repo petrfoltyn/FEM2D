@@ -1,5 +1,9 @@
 .idea/
 .vs/
+
+# Centralizovaný výstup buildu (viz Directory.Build.props)
+/out/
+
 FEALiTE2D/obj
 FEALiTE2D/bin
 FEALiTE2D.Tests/bin

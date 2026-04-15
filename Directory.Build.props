@@ -1,0 +1,20 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Shared package metadata – platí pro všechny projekty v solution -->
+    <Authors>Mohamed Salah Ibrahim</Authors>
+    <Copyright>Copyright © 2021 Mohamed Salah Ibrahim Civilms@outlook.com</Copyright>
+    <RepositoryUrl>https://github.com/FEALiTE/FEALiTE2D</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/FEALiTE/FEALiTE2D</PackageProjectUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+
+    <!-- Centralizovaný výstup: /out/<ProjectName>/<Config>/<TFM>
+         NuGet balíčky: /out/packages/ -->
+    <BaseOutputPath>$(MSBuildThisFileDirectory)out\$(MSBuildProjectName)\</BaseOutputPath>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)out\packages\</PackageOutputPath>
+  </PropertyGroup>
+
+</Project>

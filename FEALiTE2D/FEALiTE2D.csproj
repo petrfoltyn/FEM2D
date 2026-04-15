@@ -1,20 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net45;netstandard2.0;net8.0</TargetFrameworks>
-		<Authors>Mohamed Salah Ibrahim</Authors>
-		<Copyright>Copyright © 2021 Mohamed Salah Ibrahim Civilms@outlook.com</Copyright>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 		<Description>A fast and reliable finite element analysis library for 2D frame, beam and truss elements using C#.</Description>
-		<RepositoryType>git</RepositoryType>
-		<RepositoryUrl>https://github.com/FEALiTE/FEALiTE2D</RepositoryUrl>
 		<PackageTags>engineering analysis beam frame finite-elements finite-element-analysis structural-engineering structural-analysis finite-element-methods civil-engineering truss 2d-frame structral</PackageTags>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<EnableNETAnalyzers>false</EnableNETAnalyzers>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Version>1.1.2</Version>
 		<PackageReleaseNotes>Fix bug in element with parital uniform loading and corrected dxf plotting for inclined elements </PackageReleaseNotes>
-		<PackageProjectUrl>https://github.com/FEALiTE/FEALiTE2D</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
