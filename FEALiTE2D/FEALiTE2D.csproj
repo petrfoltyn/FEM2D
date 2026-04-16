@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFrameworks>net10.0</TargetFrameworks>
 		<Description>A fast and reliable finite element analysis library for 2D frame, beam and truss elements using C#.</Description>
 		<PackageTags>engineering analysis beam frame finite-elements finite-element-analysis structural-engineering structural-analysis finite-element-methods civil-engineering truss 2d-frame structral</PackageTags>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>

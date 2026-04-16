@@ -1,0 +1,25 @@
+{
+  "nodes": [
+    { "label": "n1", "x": 0, "y": 0, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": false } },
+    { "label": "n2", "x": 6, "y": 0, "support": { "type": "Rigid", "ux": false, "uy": true, "rz": false } }
+  ],
+  "materials": [
+    { "label": "M", "materialType": "Steel", "E": 210000000000, "U": 0.3 }
+  ],
+  "sections": [
+    { "type": "Rectangular", "label": "S", "materialLabel": "M", "b": 0.2, "t": 0.4 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "S" }
+  ],
+  "loadCases": [
+    {
+      "label": "LC",
+      "loadCaseType": "Live",
+      "elementLoads": [
+        { "type": "Uniform", "elementLabel": "e", "wy": -10, "direction": "Global" }
+      ]
+    }
+  ],
+  "settings": { "meshSegments": 10 }
+}

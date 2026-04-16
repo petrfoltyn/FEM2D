@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FEA Beam — UI Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ── DCE Design Tokens ─────────────────────────────────────────── */
+:root {
+  --bg:#f0ede8; --bg-warm:#e8e4dd; --surface:#fff; --surface-alt:#fafaf8;
+  --preview-bg:#f7f5f2;
+  --border:#d4cfc7; --border-light:#e8e4dd;
+  --text:#2c2a26; --text-secondary:#6b6760; --text-muted:#9e9890;
+  --accent:#c45d3e; --accent-hover:#b5512f; --accent-light:rgba(196,93,62,.08);
+  --success:#4a8c5c; --warning:#c49a3e; --error:#c45d3e; --info:#3e7ec4;
+  --shadow-sm:0 1px 3px rgba(44,42,38,.06);
+  --shadow-md:0 4px 16px rgba(44,42,38,.08);
+  --shadow-lg:0 8px 32px rgba(44,42,38,.12);
+  --shadow-xl:0 16px 48px rgba(44,42,38,.16);
+  --radius:8px; --radius-lg:12px; --radius-xl:16px;
+  --font:'DM Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --transition:0.2s cubic-bezier(.4,0,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font);background:#333;color:var(--text);min-height:100vh;}
+
+/* ── Screen switcher ───────────────────────────────────────────── */
+.switcher{
+  position:fixed;top:0;left:0;right:0;z-index:99999;
+  background:#1a1a1a;display:flex;gap:4px;padding:8px 16px;
+  border-bottom:2px solid #c45d3e;
+}
+.sw-btn{
+  font-family:var(--font);font-size:11px;font-weight:600;
+  padding:5px 12px;border-radius:4px;border:1px solid #444;
+  background:#2a2a2a;color:#aaa;cursor:pointer;transition:all .15s;
+}
+.sw-btn:hover{background:#333;color:#fff;}
+.sw-btn.active{background:#c45d3e;color:#fff;border-color:#c45d3e;}
+.sw-label{color:#666;font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.5px;align-self:center;margin-left:8px;}
+
+/* ── Screen wrapper ────────────────────────────────────────────── */
+.screen{display:none;padding-top:46px;}
+.screen.active{display:block;}
+
+/* ─────────────────────────────────────────────────────────────── */
+/*  1. TOPBAR                                                       */
+/* ─────────────────────────────────────────────────────────────── */
+.topbar{
+  height:52px;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:16px;
+}
+.topbar-storage-toggle{display:flex;gap:2px;background:var(--bg);border-radius:var(--radius);padding:2px;}
+.storage-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:32px;height:30px;border:none;border-radius:7px;
+  background:transparent;color:var(--text-muted);cursor:pointer;font-size:11px;font-weight:600;
+}
+.storage-btn.active{background:var(--surface);color:var(--accent);box-shadow:var(--shadow-sm);}
+.topbar-divider{width:1px;height:24px;background:var(--border);}
+.topbar-spacer{flex:1;}
+.topbar-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border:1px solid var(--border);border-radius:var(--radius);
+  background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px;
+}
+.topbar-btn:hover{background:var(--bg);}
+.topbar-modules{display:flex;gap:2px;background:var(--bg);border-radius:var(--radius);padding:2px;}
+.module-btn{
+  display:flex;align-items:center;gap:4px;padding:4px 12px;border:none;
+  border-radius:7px;background:transparent;color:var(--text-muted);
+  cursor:pointer;font-size:11px;font-weight:500;font-family:var(--font);
+}
+.module-btn:hover{background:var(--surface);color:var(--text);}
+.module-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+.topbar-lang-group{display:flex;align-items:center;gap:4px;}
+.topbar-lang-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;}
+.topbar-lang-toggle{display:flex;gap:1px;background:var(--bg);border-radius:var(--radius);padding:2px;}
+.lang-btn{
+  display:flex;align-items:center;justify-content:center;height:24px;padding:0 8px;
+  border:none;border-radius:7px;background:transparent;color:var(--text-muted);
+  font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);
+}
+.lang-btn.active{background:var(--surface);color:var(--accent);box-shadow:var(--shadow-sm);}
+.avatar-badge{
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:12px;color:#fff;
+  background:var(--text-muted);
+}
+.topbar-user-name{font-size:13px;font-weight:500;color:var(--text);}
+.topbar-btn-user{display:flex;align-items:center;gap:6px;width:auto;padding:0 8px;}
+.topbar-note{
+  padding:12px 20px;font-size:12px;color:var(--text-secondary);
+  background:var(--bg);border-bottom:1px solid var(--border);
+}
+.topbar-note span{color:var(--accent);font-weight:700;}
+
+/* ─────────────────────────────────────────────────────────────── */
+/*  CATALOG DIALOG (shared)                                        */
+/* ─────────────────────────────────────────────────────────────── */
+.preview-wrap{
+  background:#555;min-height:calc(100vh - 46px);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.catalog-dialog{
+  background:white;border-radius:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+  display:flex;flex-direction:column;overflow:hidden;
+  width:1200px;height:720px;max-width:98%;max-height:95vh;
+}
+.catalog-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid #EBE8E4;background:#FFF;flex-shrink:0;
+}
+.catalog-title{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.catalog-close-btn{
+  width:30px;height:30px;background:none;border:none;border-radius:50%;
+  color:#9B9590;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.catalog-close-btn:hover{background:#F5F3F0;color:#2C2926;}
+.catalog-body{display:flex;flex:1;overflow:hidden;min-height:0;}
+.catalog-panel{overflow-y:auto;overflow-x:hidden;}
+.catalog-left{border-right:1px solid #EBE8E4;flex-shrink:0;width:200px;}
+.catalog-center{
+  flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;
+  overflow:hidden;border-right:1px solid #EBE8E4;
+}
+.catalog-right{flex-shrink:0;width:320px;overflow-y:auto;}
+.catalog-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 20px;border-top:1px solid #EBE8E4;background:#FAFAF8;flex-shrink:0;
+}
+
+/* ─── Filter bar ─── */
+.se-filter-bar{
+  padding:9px 20px;border-bottom:1px solid #EBE8E4;
+  display:flex;align-items:center;gap:10px;background:#FAFAF8;flex-shrink:0;
+}
+.se-filter-label{font-size:11px;font-weight:600;color:#9B9590;text-transform:uppercase;letter-spacing:.4px;}
+.se-chips{display:flex;gap:4px;}
+.se-chip{
+  font-family:var(--font);font-size:11px;font-weight:600;padding:4px 12px;
+  border-radius:20px;border:1px solid #E2DED8;background:#FFF;color:#6B6560;cursor:pointer;
+}
+.se-chip:hover{border-color:#C45D3E;color:#C45D3E;}
+.se-chip.active{background:#C45D3E;color:#fff;border-color:#C45D3E;}
+
+/* ─── Toolbar ─── */
+.se-toolbar{
+  padding:8px 10px;border-bottom:1px solid #EBE8E4;
+  display:flex;gap:4px;background:#FAFAF8;
+}
+.se-tb-btn{
+  font-size:10px;font-weight:600;padding:4px 8px;border-radius:5px;
+  border:1px solid #E2DED8;background:#FFF;color:#6B6560;cursor:pointer;
+  display:inline-flex;align-items:center;gap:3px;font-family:var(--font);
+}
+.se-tb-btn:hover{border-color:#C45D3E;color:#C45D3E;}
+
+/* ─── Buttons ─── */
+.se-btn{font-family:var(--font);font-size:12px;font-weight:600;padding:7px 16px;border-radius:5px;border:none;cursor:pointer;}
+.se-btn-primary{background:#C45D3E;color:#fff;}
+.se-btn-primary:hover{background:#A84E34;}
+.se-btn-secondary{background:transparent;color:#6B6560;border:1px solid #E2DED8;}
+.se-btn-secondary:hover{background:#F5F3F0;}
+
+/* ─── Tree panel ─── */
+.tree-panel{padding:8px 0;overflow-y:auto;height:100%;}
+.tree-category{
+  padding:5px 14px;font-size:10px;font-weight:700;color:#9B9590;
+  text-transform:uppercase;letter-spacing:.5px;display:flex;
+  align-items:center;gap:5px;margin-top:6px;
+}
+.tree-item{
+  padding:7px 14px 7px 28px;font-size:12px;color:#6B6560;cursor:pointer;
+  display:flex;align-items:center;gap:7px;border-left:3px solid transparent;
+}
+.tree-item:hover{background:rgba(196,93,62,.04);color:#2C2926;}
+.tree-item.selected{background:rgba(196,93,62,.08);border-left-color:#C45D3E;color:#2C2926;font-weight:600;}
+
+/* ─── Preview canvas ─── */
+.section-preview{display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden;}
+.preview-header{
+  padding:8px 14px;border-bottom:1px solid #E2DED8;
+  display:flex;align-items:center;justify-content:space-between;
+  background:#FFF;flex-shrink:0;gap:6px;
+}
+.preview-title{font-size:11px;font-weight:600;color:#6B6560;}
+.preview-tools{display:flex;gap:4px;}
+.preview-canvas{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;background:var(--preview-bg);padding:24px;min-height:0;
+}
+
+/* ─── Right panel fieldset ─── */
+.rp-panel{padding:16px 18px;overflow-y:auto;}
+.lg-fieldset{margin-bottom:20px;}
+.lg-fieldset-title{
+  font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:10px;padding-bottom:6px;
+  border-bottom:1px solid var(--border-light);
+}
+.lg-form-row{display:grid;grid-template-columns:110px 1fr 36px;align-items:center;gap:8px;margin-bottom:8px;}
+.lg-form-label{font-size:12px;font-weight:600;color:var(--text-secondary);}
+.lg-form-input{
+  font-size:12.5px;padding:7px 10px;border:1px solid var(--border);border-radius:5px;
+  outline:none;background:var(--surface);color:var(--text);width:100%;font-family:var(--font);
+}
+.lg-form-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(196,93,62,.08);}
+.lg-form-input.ro{background:var(--bg);color:var(--text-secondary);}
+.lg-form-select{
+  font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:5px;
+  outline:none;background:var(--surface);color:var(--text);cursor:pointer;width:100%;font-family:var(--font);
+}
+.lg-form-unit{font-size:11px;font-weight:500;color:var(--text-muted);}
+.seg-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
+.seg-table th{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;
+  padding:5px 8px;text-align:left;border-bottom:2px solid var(--border);}
+.seg-table td{padding:6px 8px;border-bottom:1px solid var(--border-light);color:var(--text);}
+.seg-table tr:hover td{background:rgba(196,93,62,.04);}
+.seg-link{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;}
+
+/* ─── LG master/detail (Loads + CharSections) ─── */
+.lg-master{width:220px;min-width:220px;border-right:1px solid var(--border-light);display:flex;flex-direction:column;flex-shrink:0;}
+.lg-toolbar{padding:8px 10px;border-bottom:1px solid var(--border-light);display:flex;gap:4px;background:var(--surface-alt);}
+.lg-tb-btn{
+  font-size:10px;font-weight:600;padding:4px 8px;border-radius:5px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;display:flex;align-items:center;gap:3px;font-family:var(--font);
+}
+.lg-tb-btn:hover{border-color:var(--accent);color:var(--accent);}
+.lg-list{flex:1;overflow-y:auto;}
+.lg-item{
+  padding:9px 14px;border-bottom:1px solid var(--border-light);
+  cursor:pointer;display:flex;flex-direction:column;gap:2px;
+}
+.lg-item:hover{background:rgba(196,93,62,.04);}
+.lg-item.selected{background:rgba(196,93,62,.08);border-left:3px solid var(--accent);padding-left:11px;}
+.lg-item-name{font-size:12.5px;font-weight:600;}
+.lg-item-sub{font-size:10px;color:var(--text-muted);}
+.lg-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;white-space:nowrap;align-self:flex-start;}
+.badge-dead{background:#EFEBE9;color:#5D4037;}
+.badge-live{background:#E3F2FD;color:#1565C0;}
+.badge-auto{background:rgba(196,154,62,.15);color:#8a6b20;}
+.badge-custom{background:rgba(62,126,196,.12);color:#1a5a9e;}
+.lg-detail{flex:1;overflow-y:auto;padding:20px 22px;}
+.lg-empty{height:100%;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;color:var(--text-muted);font-size:13px;}
+
+/* ─── Results table ─── */
+.forces-table{width:100%;border-collapse:collapse;font-size:12px;}
+.forces-table th{
+  font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.3px;padding:6px 10px;text-align:right;border-bottom:2px solid var(--border);
+}
+.forces-table th:first-child{text-align:left;}
+.forces-table td{padding:6px 10px;border-bottom:1px solid var(--border-light);text-align:right;font-family:var(--font-mono);font-size:11.5px;}
+.forces-table td:first-child{text-align:left;font-family:var(--font);font-weight:600;font-size:12px;}
+.forces-table .extreme{color:var(--accent);font-weight:700;}
+
+/* ─── Diagram switcher ─── */
+.diag-switch{display:flex;gap:4px;}
+.diag-btn{
+  font-size:10px;font-weight:700;padding:3px 10px;border-radius:4px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);cursor:pointer;
+  font-family:var(--font);
+}
+.diag-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* ─────────────────────────────────────────────────────────────── */
+/*  A4 KAPITOLA                                                     */
+/* ─────────────────────────────────────────────────────────────── */
+.a4-wrap{
+  background:#666;min-height:calc(100vh - 46px);
+  display:flex;justify-content:center;padding:32px;
+}
+.a4-page{
+  background:#fff;width:794px;min-height:1123px;flex-shrink:0;
+  box-shadow:0 4px 32px rgba(0,0,0,.35);padding:40px 48px;
+  font-family:var(--font);
+}
+.chapter-title{
+  font-size:14px;font-weight:700;color:var(--text);padding:8px 0;
+  border-bottom:2px solid var(--accent);margin-bottom:20px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title{
+  font-size:12px;font-weight:700;color:var(--text-secondary);padding:6px 0;
+  border-bottom:1px solid var(--border);margin:18px 0 12px;
+  text-transform:uppercase;letter-spacing:.4px;
+}
+.a4-svg-block{
+  background:var(--preview-bg);border:1px solid var(--border);
+  border-radius:6px;padding:16px;margin-bottom:12px;cursor:pointer;
+  transition:border-color var(--transition),box-shadow var(--transition);
+}
+.a4-svg-block:hover{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light);}
+.a4-svg-block:hover::after{
+  content:'Klikněte pro úpravu';
+  display:block;font-size:10px;color:var(--accent);font-weight:600;
+  text-align:center;margin-top:6px;
+}
+.a4-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:16px;}
+.a4-table th{
+  font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.3px;padding:5px 8px;text-align:left;border-bottom:2px solid var(--border);
+}
+.a4-table td{padding:5px 8px;border-bottom:1px solid var(--border-light);}
+.a4-table td.num{text-align:right;font-family:var(--font-mono);font-size:11px;}
+.a4-table tr.extreme td{color:var(--accent);font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- ══ Screen switcher ══════════════════════════════════════════ -->
+<div class="switcher">
+  <span class="sw-label">Náhledy:</span>
+  <button class="sw-btn active" onclick="show('s0')">0 · TopBar</button>
+  <button class="sw-btn" onclick="show('s1')">1 · Geometrie</button>
+  <button class="sw-btn" onclick="show('s2')">2 · Zatížení</button>
+  <button class="sw-btn" onclick="show('s3')">3 · Výsledky</button>
+  <button class="sw-btn" onclick="show('s4')">4 · Char. řezy</button>
+  <button class="sw-btn" onclick="show('s5')">5 · A4 kapitola</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     0 · TOPBAR
+═══════════════════════════════════════════════════════════════ -->
+<div id="s0" class="screen active" style="background:var(--bg);">
+  <div class="topbar">
+    <div class="topbar-storage-toggle">
+      <button class="storage-btn active">≡</button>
+      <button class="storage-btn">🗄</button>
+    </div>
+    <div class="topbar-divider"></div>
+    <button class="topbar-btn" title="Save">💾</button>
+    <button class="topbar-btn" title="Open">📂</button>
+    <button class="topbar-btn" title="Print">🖨</button>
+    <div class="topbar-divider"></div>
+    <button class="topbar-btn" title="Undo">↩</button>
+    <button class="topbar-btn" title="Redo">↪</button>
+    <div class="topbar-divider"></div>
+    <button class="topbar-btn" title="Sections">📐</button>
+    <button class="topbar-btn" title="Loads">⚖</button>
+    <button class="topbar-btn" title="Materials">🧱</button>
+    <button class="topbar-btn" title="Settings">⚙</button>
+    <div class="topbar-spacer"></div>
+
+    <!-- Module switcher — Beam je nový modul -->
+    <div class="topbar-modules">
+      <button class="module-btn">
+        <span>✛</span><span class="module-label">Cross Section</span>
+      </button>
+      <button class="module-btn active">
+        <span>⟋</span><span class="module-label">Beam</span>
+      </button>
+    </div>
+
+    <div class="topbar-divider"></div>
+    <div class="topbar-lang-group">
+      <span class="topbar-lang-label">UI</span>
+      <div class="topbar-lang-toggle">
+        <button class="lang-btn active">CS</button>
+        <button class="lang-btn">EN</button>
+      </div>
+    </div>
+    <div class="topbar-divider"></div>
+    <button class="topbar-btn topbar-btn-user">
+      <div class="avatar-badge">PF</div>
+      <span class="topbar-user-name">Petr Foltyn</span>
+    </button>
+  </div>
+
+  <div class="topbar-note">
+    Klik na <span>Beam</span> v module switcheru otevře
+    <strong>BeamAnalysisDialog</strong>. Nový modul sedí vedle Cross Section —
+    stejný <code>.topbar-modules</code> / <code>.module-btn.active</code> pattern.
+  </div>
+
+  <div style="padding:32px 40px;max-width:700px;">
+    <h2 style="font-size:15px;font-weight:700;margin-bottom:12px;">Komponenty TopBaru</h2>
+    <table style="width:100%;font-size:12px;border-collapse:collapse;">
+      <tr style="border-bottom:2px solid var(--border);">
+        <th style="text-align:left;padding:6px 10px;font-size:10px;color:var(--text-muted);text-transform:uppercase;">Oblast</th>
+        <th style="text-align:left;padding:6px 10px;font-size:10px;color:var(--text-muted);text-transform:uppercase;">CSS třída</th>
+        <th style="text-align:left;padding:6px 10px;font-size:10px;color:var(--text-muted);text-transform:uppercase;">Stav</th>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border-light);">
+        <td style="padding:6px 10px;">Beam tlačítko</td>
+        <td style="padding:6px 10px;font-family:monospace;color:var(--accent);">.module-btn.active</td>
+        <td style="padding:6px 10px;color:var(--success);">✅ existuje</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border-light);">
+        <td style="padding:6px 10px;">Module switcher</td>
+        <td style="padding:6px 10px;font-family:monospace;color:var(--accent);">.topbar-modules</td>
+        <td style="padding:6px 10px;color:var(--success);">✅ existuje</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     1 · BEAM ANALYSIS — TAB: GEOMETRIE
+═══════════════════════════════════════════════════════════════ -->
+<div id="s1" class="screen">
+  <div class="preview-wrap">
+    <div class="catalog-dialog">
+
+      <!-- Header -->
+      <div class="catalog-header">
+        <h2 class="catalog-title">⟋ &nbsp;Beam Analysis</h2>
+        <button class="catalog-close-btn">✕</button>
+      </div>
+
+      <!-- Filter bar = tab switcher -->
+      <div class="se-filter-bar">
+        <span class="se-filter-label">Modul:</span>
+        <div class="se-chips">
+          <button class="se-chip active">Geometrie</button>
+          <button class="se-chip">Zatížení</button>
+          <button class="se-chip">Výsledky</button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="catalog-body">
+
+        <!-- LEFT: šablony -->
+        <div class="catalog-panel catalog-left">
+          <div class="tree-panel">
+            <div class="tree-category">Jednopole</div>
+            <div class="tree-item">
+              <span>▽——▽</span>&nbsp; Prostý nosník
+            </div>
+            <div class="tree-item selected">
+              <span>▐——▽</span>&nbsp; Vetknutý / kloub
+            </div>
+            <div class="tree-item">
+              <span>▐——▐</span>&nbsp; Ob. vetknutý
+            </div>
+            <div class="tree-category">Spojité</div>
+            <div class="tree-item">
+              <span>▽—▽—▽</span>&nbsp; Dvoupole
+            </div>
+            <div class="tree-item">
+              <span>▽—▽—▽—▽</span>&nbsp; Třípole
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: canvas -->
+        <div class="catalog-center">
+          <div class="section-preview">
+            <div class="preview-header">
+              <span class="preview-title">Schéma konstrukce</span>
+              <div class="preview-tools">
+                <button class="se-tb-btn">↕ Select</button>
+                <button class="se-tb-btn">✋ Pan</button>
+                <button class="se-tb-btn">⊕ Zoom fit</button>
+              </div>
+            </div>
+            <div class="preview-canvas">
+              <!-- SVG: vetknutý nosník -->
+              <svg viewBox="0 0 560 220" width="100%" style="max-height:300px;">
+                <!-- Vetknutí vlevo -->
+                <rect x="20" y="70" width="14" height="80" fill="#9e9890"/>
+                <line x1="8" y1="70" x2="8" y2="150" stroke="#9e9890" stroke-width="2"/>
+                <line x1="2" y1="75" x2="14" y2="65" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="2" y1="90" x2="14" y2="80" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="2" y1="105" x2="14" y2="95" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="2" y1="120" x2="14" y2="110" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="2" y1="135" x2="14" y2="125" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="2" y1="148" x2="14" y2="138" stroke="#9e9890" stroke-width="1.5"/>
+                <!-- Nosník -->
+                <line x1="34" y1="110" x2="490" y2="110" stroke="#2c2a26" stroke-width="5" stroke-linecap="round"/>
+                <!-- Kloub vpravo -->
+                <polygon points="490,110 510,130 470,130" fill="none" stroke="#2c2a26" stroke-width="1.8"/>
+                <line x1="460" y1="133" x2="520" y2="133" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="455" y1="139" x2="465" y2="133" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="470" y1="139" x2="480" y2="133" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="485" y1="139" x2="495" y2="133" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="500" y1="139" x2="510" y2="133" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="515" y1="139" x2="525" y2="133" stroke="#9e9890" stroke-width="1.2"/>
+                <!-- Uzel labels -->
+                <circle cx="34" cy="110" r="5" fill="#c45d3e"/>
+                <text x="34" y="98" text-anchor="middle" font-size="11" fill="#6b6760" font-family="DM Sans,sans-serif">n1</text>
+                <circle cx="490" cy="110" r="5" fill="#c45d3e"/>
+                <text x="490" y="98" text-anchor="middle" font-size="11" fill="#6b6760" font-family="DM Sans,sans-serif">n2</text>
+                <!-- Element label -->
+                <text x="262" y="100" text-anchor="middle" font-size="11" fill="#6b6760" font-family="DM Sans,sans-serif">e1 · IPE 300</text>
+                <!-- Kóta -->
+                <line x1="34" y1="165" x2="490" y2="165" stroke="#9e9890" stroke-width="1" stroke-dasharray="4,3"/>
+                <line x1="34" y1="160" x2="34" y2="170" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="490" y1="160" x2="490" y2="170" stroke="#9e9890" stroke-width="1.5"/>
+                <text x="262" y="180" text-anchor="middle" font-size="12" fill="#6b6760" font-family="DM Sans,sans-serif">L = 8.00 m</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: vlastnosti -->
+        <div class="catalog-panel catalog-right">
+          <div class="rp-panel">
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Délka</div>
+              <div class="lg-form-row">
+                <span class="lg-form-label">L</span>
+                <input class="lg-form-input" value="8.00" type="number">
+                <span class="lg-form-unit">m</span>
+              </div>
+            </div>
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Levá podpora</div>
+              <div class="lg-form-row" style="grid-template-columns:110px 1fr;">
+                <span class="lg-form-label">Typ</span>
+                <select class="lg-form-select">
+                  <option>Vetknutí (fix)</option>
+                  <option>Kloub</option>
+                  <option>Pružina</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Pravá podpora</div>
+              <div class="lg-form-row" style="grid-template-columns:110px 1fr;">
+                <span class="lg-form-label">Typ</span>
+                <select class="lg-form-select">
+                  <option>Kloub</option>
+                  <option>Vetknutí (fix)</option>
+                  <option>Pružina</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>Průřezy po délce</span>
+                <button class="se-tb-btn">+ Přidat</button>
+              </div>
+              <table class="seg-table">
+                <thead>
+                  <tr>
+                    <th>Od</th><th>Do</th><th>Průřez</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0.0</td>
+                    <td>8.0</td>
+                    <td><span class="seg-link">IPE 300</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Uvolnění konců (end release)</div>
+              <div class="lg-form-row" style="grid-template-columns:110px 1fr;">
+                <span class="lg-form-label">Levý</span>
+                <select class="lg-form-select">
+                  <option>Tuhý spoj</option>
+                  <option>Kloub</option>
+                </select>
+              </div>
+              <div class="lg-form-row" style="grid-template-columns:110px 1fr;">
+                <span class="lg-form-label">Pravý</span>
+                <select class="lg-form-select">
+                  <option>Tuhý spoj</option>
+                  <option>Kloub</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div><!-- /catalog-body -->
+
+      <!-- Footer -->
+      <div class="catalog-footer">
+        <button class="se-btn se-btn-secondary">Zrušit</button>
+        <button class="se-btn se-btn-primary">Pokračovat → Zatížení</button>
+      </div>
+
+    </div><!-- /catalog-dialog -->
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     2 · BEAM ANALYSIS — TAB: ZATÍŽENÍ
+═══════════════════════════════════════════════════════════════ -->
+<div id="s2" class="screen">
+  <div class="preview-wrap">
+    <div class="catalog-dialog">
+
+      <div class="catalog-header">
+        <h2 class="catalog-title">⟋ &nbsp;Beam Analysis</h2>
+        <button class="catalog-close-btn">✕</button>
+      </div>
+
+      <div class="se-filter-bar">
+        <span class="se-filter-label">Modul:</span>
+        <div class="se-chips">
+          <button class="se-chip">Geometrie</button>
+          <button class="se-chip active">Zatížení</button>
+          <button class="se-chip">Výsledky</button>
+        </div>
+      </div>
+
+      <div class="catalog-body">
+
+        <!-- LEFT: load cases -->
+        <div class="catalog-left" style="display:flex;flex-direction:column;width:220px;overflow:hidden;">
+          <div class="lg-toolbar">
+            <button class="lg-tb-btn">+ LC</button>
+            <button class="lg-tb-btn">✎</button>
+            <button class="lg-tb-btn" style="margin-left:auto;">🗑</button>
+          </div>
+          <div class="lg-list">
+            <div class="lg-item selected">
+              <span class="lg-item-name">LC1 — Dead</span>
+              <span class="lg-item-sub">2 zatížení</span>
+              <span class="lg-badge badge-dead">DEAD</span>
+            </div>
+            <div class="lg-item">
+              <span class="lg-item-name">LC2 — Live</span>
+              <span class="lg-item-sub">1 zatížení</span>
+              <span class="lg-badge badge-live">LIVE</span>
+            </div>
+          </div>
+          <!-- loads in selected LC -->
+          <div style="border-top:1px solid var(--border-light);flex-shrink:0;">
+            <div class="lg-toolbar">
+              <span style="font-size:10px;font-weight:700;color:var(--text-muted);padding:2px 4px;">ZATÍŽENÍ LC1</span>
+              <button class="lg-tb-btn" style="margin-left:auto;">+ Add</button>
+            </div>
+            <div class="lg-item selected">
+              <span class="lg-item-name">Uniform wy = −12 kN/m</span>
+              <span class="lg-item-sub">x: 0.0 → 8.0 m · Local</span>
+            </div>
+            <div class="lg-item">
+              <span class="lg-item-name">Point Fy = −50 kN</span>
+              <span class="lg-item-sub">x = 4.0 m · Global</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: canvas -->
+        <div class="catalog-center">
+          <div class="section-preview">
+            <div class="preview-header">
+              <span class="preview-title">LC1 — Dead</span>
+              <div class="diag-switch">
+                <button class="diag-btn active">Zatížení</button>
+                <button class="diag-btn">M</button>
+                <button class="diag-btn">V</button>
+                <button class="diag-btn">N</button>
+              </div>
+            </div>
+            <div class="preview-canvas">
+              <svg viewBox="0 0 560 260" width="100%" style="max-height:320px;">
+                <!-- Spojité zatížení — šipky + čára -->
+                <line x1="34" y1="60" x2="490" y2="60" stroke="#3e7ec4" stroke-width="1.5"/>
+                <text x="262" y="52" text-anchor="middle" font-size="11" fill="#3e7ec4" font-family="DM Sans,sans-serif">wy = −12 kN/m</text>
+                <line x1="60"  y1="60" x2="60"  y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <line x1="110" y1="60" x2="110" y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <line x1="160" y1="60" x2="160" y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <line x1="210" y1="60" x2="210" y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <line x1="260" y1="60" x2="260" y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <line x1="310" y1="60" x2="310" y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <line x1="360" y1="60" x2="360" y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <line x1="410" y1="60" x2="410" y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <line x1="460" y1="60" x2="460" y2="108" stroke="#3e7ec4" stroke-width="1.2" marker-end="url(#arr)"/>
+                <defs>
+                  <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+                    <path d="M0,0 L3,6 L6,0" fill="none" stroke="#3e7ec4" stroke-width="1.2"/>
+                  </marker>
+                  <marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+                    <path d="M0,0 L3,6 L6,0" fill="none" stroke="#c45d3e" stroke-width="1.5"/>
+                  </marker>
+                </defs>
+                <!-- Bodová síla -->
+                <line x1="262" y1="40" x2="262" y2="108" stroke="#c45d3e" stroke-width="2" marker-end="url(#arr2)"/>
+                <text x="278" y="35" font-size="11" fill="#c45d3e" font-family="DM Sans,sans-serif">Fy=−50 kN</text>
+                <text x="262" y="180" text-anchor="middle" font-size="10" fill="#9e9890" font-family="DM Sans,sans-serif">x = 4.0 m</text>
+                <line x1="262" y1="112" x2="262" y2="175" stroke="#c45d3e" stroke-width="1" stroke-dasharray="3,3"/>
+                <!-- Nosník -->
+                <rect x="20" y="70" width="14" height="80" fill="#9e9890"/>
+                <line x1="8" y1="70" x2="8" y2="150" stroke="#9e9890" stroke-width="2"/>
+                <line x1="2" y1="77" x2="14" y2="67" stroke="#9e9890" stroke-width="1.2"/><line x1="2" y1="92" x2="14" y2="82" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="2" y1="107" x2="14" y2="97" stroke="#9e9890" stroke-width="1.2"/><line x1="2" y1="122" x2="14" y2="112" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="2" y1="137" x2="14" y2="127" stroke="#9e9890" stroke-width="1.2"/><line x1="2" y1="150" x2="14" y2="140" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="34" y1="112" x2="490" y2="112" stroke="#2c2a26" stroke-width="5" stroke-linecap="round"/>
+                <polygon points="490,112 510,132 470,132" fill="none" stroke="#2c2a26" stroke-width="1.8"/>
+                <line x1="460" y1="135" x2="520" y2="135" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="455" y1="141" x2="465" y2="135" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="470" y1="141" x2="480" y2="135" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="485" y1="141" x2="495" y2="135" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="500" y1="141" x2="510" y2="135" stroke="#9e9890" stroke-width="1.2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: editor zatížení -->
+        <div class="catalog-panel catalog-right">
+          <div class="rp-panel">
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Vybrané zatížení</div>
+
+              <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+                <button class="se-chip active">Uniform</button>
+                <button class="se-chip">Point</button>
+                <button class="se-chip">Trapezoidal</button>
+              </div>
+
+              <div class="lg-form-row" style="grid-template-columns:110px 1fr;">
+                <span class="lg-form-label">Směr</span>
+                <select class="lg-form-select">
+                  <option>Local</option>
+                  <option>Global</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Intenzita</div>
+              <div class="lg-form-row">
+                <span class="lg-form-label">wy</span>
+                <input class="lg-form-input" value="-12.0" type="number">
+                <span class="lg-form-unit">kN/m</span>
+              </div>
+              <div class="lg-form-row">
+                <span class="lg-form-label">wx</span>
+                <input class="lg-form-input" value="0.0" type="number">
+                <span class="lg-form-unit">kN/m</span>
+              </div>
+            </div>
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Rozsah</div>
+              <div class="lg-form-row">
+                <span class="lg-form-label">Od x</span>
+                <input class="lg-form-input" value="0.0" type="number">
+                <span class="lg-form-unit">m</span>
+              </div>
+              <div class="lg-form-row">
+                <span class="lg-form-label">Do x</span>
+                <input class="lg-form-input" value="8.0" type="number">
+                <span class="lg-form-unit">m</span>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+              <button class="se-btn se-btn-secondary">Zrušit</button>
+              <button class="se-btn se-btn-primary">✓ Uložit</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="catalog-footer">
+        <button class="se-btn se-btn-secondary">← Zpět</button>
+        <button class="se-btn se-btn-primary">▶ Spustit výpočet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     3 · BEAM ANALYSIS — TAB: VÝSLEDKY
+═══════════════════════════════════════════════════════════════ -->
+<div id="s3" class="screen">
+  <div class="preview-wrap">
+    <div class="catalog-dialog">
+
+      <div class="catalog-header">
+        <h2 class="catalog-title">⟋ &nbsp;Beam Analysis</h2>
+        <button class="catalog-close-btn">✕</button>
+      </div>
+
+      <div class="se-filter-bar" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="se-filter-label">Modul:</span>
+          <div class="se-chips">
+            <button class="se-chip">Geometrie</button>
+            <button class="se-chip">Zatížení</button>
+            <button class="se-chip active">Výsledky</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="se-filter-label">LC / Komb:</span>
+          <select class="lg-form-select" style="width:160px;">
+            <option>LC1 — Dead</option>
+            <option>LC2 — Live</option>
+            <option>ULS1 (1.35·D+1.5·L)</option>
+          </select>
+          <div class="diag-switch">
+            <button class="diag-btn active">M</button>
+            <button class="diag-btn">V</button>
+            <button class="diag-btn">N</button>
+            <button class="diag-btn">Def.</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="catalog-body">
+
+        <!-- LEFT: uzly a prvky -->
+        <div class="catalog-panel catalog-left">
+          <div class="tree-panel">
+            <div class="tree-category">Uzly</div>
+            <div class="tree-item selected">
+              n1 &nbsp;<span style="color:var(--text-muted);font-size:10px;">Ry = 37.2 kN</span>
+            </div>
+            <div class="tree-item">
+              n2 &nbsp;<span style="color:var(--text-muted);font-size:10px;">Ry = 12.8 kN</span>
+            </div>
+            <div class="tree-category">Prvky</div>
+            <div class="tree-item">
+              e1 &nbsp;<span style="color:var(--accent);font-size:10px;font-weight:700;">★ Mmax = 62.5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: M diagram -->
+        <div class="catalog-center">
+          <div class="section-preview">
+            <div class="preview-header">
+              <span class="preview-title">Ohybový moment M — LC1 Dead</span>
+              <span style="font-size:10px;color:var(--accent);font-weight:700;">★ Mmax = 62.5 kNm @ x = 4.0 m</span>
+            </div>
+            <div class="preview-canvas">
+              <svg viewBox="0 0 560 260" width="100%" style="max-height:320px;">
+                <!-- Nosník -->
+                <rect x="20" y="110" width="14" height="80" fill="#9e9890"/>
+                <line x1="8" y1="110" x2="8" y2="190" stroke="#9e9890" stroke-width="2"/>
+                <line x1="2" y1="117" x2="14" y2="107" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="2" y1="132" x2="14" y2="122" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="2" y1="147" x2="14" y2="137" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="2" y1="162" x2="14" y2="152" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="2" y1="177" x2="14" y2="167" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="2" y1="190" x2="14" y2="180" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="34" y1="150" x2="490" y2="150" stroke="#2c2a26" stroke-width="4.5" stroke-linecap="round"/>
+                <polygon points="490,150 510,168 470,168" fill="none" stroke="#2c2a26" stroke-width="1.8"/>
+                <line x1="460" y1="171" x2="520" y2="171" stroke="#9e9890" stroke-width="1.5"/>
+                <line x1="455" y1="177" x2="465" y2="171" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="470" y1="177" x2="480" y2="171" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="485" y1="177" x2="495" y2="171" stroke="#9e9890" stroke-width="1.2"/>
+                <line x1="500" y1="177" x2="510" y2="171" stroke="#9e9890" stroke-width="1.2"/>
+                <!-- M diagram — parabolická plocha pod nosníkem -->
+                <path d="M34,150 Q262,215 490,150" fill="rgba(196,93,62,.18)" stroke="#c45d3e" stroke-width="1.5"/>
+                <line x1="34" y1="150" x2="34" y2="150" stroke="#c45d3e" stroke-width="1"/>
+                <!-- Vetknutý moment vlevo (záporný) -->
+                <path d="M34,150 Q34,120 34,100" fill="none" stroke="#4a8c5c" stroke-width="1.5" stroke-dasharray="4,3"/>
+                <line x1="34" y1="150" x2="34" y2="100" stroke="#4a8c5c" stroke-width="1.5"/>
+                <rect x="10" y="100" width="24" height="50" fill="rgba(74,140,92,.12)" stroke="#4a8c5c" stroke-width="1"/>
+                <!-- max label -->
+                <line x1="262" y1="215" x2="262" y2="150" stroke="#c45d3e" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="270" y="224" font-size="11" fill="#c45d3e" font-weight="700" font-family="DM Sans,sans-serif">★ 62.5 kNm</text>
+                <!-- neg moment label -->
+                <text x="2" y="95" font-size="10" fill="#4a8c5c" font-family="DM Sans,sans-serif">−24.0</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: tabulky -->
+        <div class="catalog-panel catalog-right">
+          <div class="rp-panel">
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Reakce podpor</div>
+              <table class="forces-table">
+                <thead>
+                  <tr>
+                    <th>Uzel</th><th>Fy [kN]</th><th>Mz [kNm]</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>n1</td><td>37.20</td><td class="extreme">−24.00</td>
+                  </tr>
+                  <tr>
+                    <td>n2</td><td>12.80</td><td>0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Extrémy prvku e1</div>
+              <table class="forces-table">
+                <thead>
+                  <tr>
+                    <th>Veličina</th><th>Max</th><th>Min</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>M [kNm]</td>
+                    <td class="extreme">★ 62.50</td>
+                    <td>−24.00</td>
+                  </tr>
+                  <tr>
+                    <td>V [kN]</td>
+                    <td class="extreme">★ 37.20</td>
+                    <td>−12.80</td>
+                  </tr>
+                  <tr>
+                    <td>N [kN]</td>
+                    <td>0.00</td>
+                    <td>0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="lg-fieldset">
+              <div class="lg-fieldset-title">Posuny uzlů</div>
+              <table class="forces-table">
+                <thead>
+                  <tr>
+                    <th>Uzel</th><th>Uy [mm]</th><th>Rz [mrad]</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>n1</td><td>0.00</td><td>0.00</td></tr>
+                  <tr><td>n2</td><td class="extreme">−14.52</td><td>−4.83</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="catalog-footer" style="justify-content:space-between;">
+        <button class="se-btn se-btn-secondary">Charakteristické řezy…</button>
+        <button class="se-btn se-btn-primary">Odeslat do DCE ▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     4 · CHARAKTERISTICKÉ ŘEZY
+═══════════════════════════════════════════════════════════════ -->
+<div id="s4" class="screen">
+  <div class="preview-wrap">
+    <div class="catalog-dialog" style="width:880px;height:580px;">
+
+      <div class="catalog-header">
+        <h2 class="catalog-title">✂ &nbsp;Charakteristické řezy pro posouzení</h2>
+        <button class="catalog-close-btn">✕</button>
+      </div>
+
+      <div class="se-filter-bar">
+        <span class="se-filter-label">Typ:</span>
+        <div class="se-chips">
+          <button class="se-chip active">Vše</button>
+          <button class="se-chip">★ Automatické</button>
+          <button class="se-chip">+ Vlastní</button>
+        </div>
+      </div>
+
+      <div class="catalog-body">
+
+        <!-- LEFT: seznam řezů -->
+        <div style="width:260px;min-width:260px;border-right:1px solid var(--border-light);display:flex;flex-direction:column;">
+          <div class="lg-toolbar">
+            <button class="lg-tb-btn">+ Vlastní řez</button>
+          </div>
+          <div class="lg-list">
+            <div class="lg-item selected">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="lg-item-name">★ Mmax</span>
+                <span class="lg-badge badge-auto">AUTO</span>
+              </div>
+              <span class="lg-item-sub">x = 4.00 m · ULS1</span>
+            </div>
+            <div class="lg-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="lg-item-name">★ Mmin</span>
+                <span class="lg-badge badge-auto">AUTO</span>
+              </div>
+              <span class="lg-item-sub">x = 0.00 m · ULS2</span>
+            </div>
+            <div class="lg-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="lg-item-name">★ Vmax</span>
+                <span class="lg-badge badge-auto">AUTO</span>
+              </div>
+              <span class="lg-item-sub">x = 0.00 m · ULS1</span>
+            </div>
+            <div style="height:1px;background:var(--border-light);margin:4px 0;"></div>
+            <div class="lg-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="lg-item-name">+ Vlastní řez 1</span>
+                <span class="lg-badge badge-custom">CUSTOM</span>
+              </div>
+              <span class="lg-item-sub">x = 2.50 m · ULS1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: detail -->
+        <div class="lg-detail">
+          <!-- Mini beam SVG -->
+          <div style="background:var(--preview-bg);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:20px;">
+            <svg viewBox="0 0 400 80" width="100%" style="height:70px;">
+              <rect x="10" y="20" width="10" height="40" fill="#9e9890"/>
+              <line x1="4" y1="20" x2="4" y2="60" stroke="#9e9890" stroke-width="1.5"/>
+              <line x1="0" y1="25" x2="10" y2="17" stroke="#9e9890" stroke-width="1"/>
+              <line x1="0" y1="37" x2="10" y2="29" stroke="#9e9890" stroke-width="1"/>
+              <line x1="0" y1="49" x2="10" y2="41" stroke="#9e9890" stroke-width="1"/>
+              <line x1="0" y1="59" x2="10" y2="51" stroke="#9e9890" stroke-width="1"/>
+              <line x1="20" y1="40" x2="360" y2="40" stroke="#2c2a26" stroke-width="4" stroke-linecap="round"/>
+              <polygon points="360,40 374,52 346,52" fill="none" stroke="#2c2a26" stroke-width="1.5"/>
+              <line x1="340" y1="54" x2="388" y2="54" stroke="#9e9890" stroke-width="1.2"/>
+              <line x1="336" y1="58" x2="344" y2="54" stroke="#9e9890" stroke-width="1"/>
+              <line x1="350" y1="58" x2="358" y2="54" stroke="#9e9890" stroke-width="1"/>
+              <line x1="364" y1="58" x2="372" y2="54" stroke="#9e9890" stroke-width="1"/>
+              <line x1="378" y1="58" x2="386" y2="54" stroke="#9e9890" stroke-width="1"/>
+              <!-- Řez marker -->
+              <line x1="192" y1="20" x2="192" y2="64" stroke="#c45d3e" stroke-width="2" stroke-dasharray="4,3"/>
+              <text x="200" y="18" font-size="10" fill="#c45d3e" font-weight="700" font-family="DM Sans,sans-serif">x = 4.0 m</text>
+            </svg>
+          </div>
+
+          <div class="lg-fieldset">
+            <div class="lg-fieldset-title">Poloha a kombinace</div>
+            <div class="lg-form-row">
+              <span class="lg-form-label">Poloha x</span>
+              <input class="lg-form-input ro" value="4.00" type="number" readonly>
+              <span class="lg-form-unit">m</span>
+            </div>
+            <div class="lg-form-row" style="grid-template-columns:110px 1fr 36px;">
+              <span class="lg-form-label">LC / Komb.</span>
+              <select class="lg-form-select">
+                <option>ULS1 (1.35·D+1.5·L)</option>
+                <option>ULS2</option>
+                <option>SLS char.</option>
+              </select>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="lg-fieldset">
+            <div class="lg-fieldset-title">Vnitřní síly (read-only)</div>
+            <div class="lg-form-row">
+              <span class="lg-form-label">N_Ed</span>
+              <input class="lg-form-input ro" value="-1.20" readonly>
+              <span class="lg-form-unit">kN</span>
+            </div>
+            <div class="lg-form-row">
+              <span class="lg-form-label">M_Ed</span>
+              <input class="lg-form-input ro" value="62.50" readonly style="color:var(--accent);font-weight:700;">
+              <span class="lg-form-unit">kNm</span>
+            </div>
+            <div class="lg-form-row">
+              <span class="lg-form-label">V_Ed</span>
+              <input class="lg-form-input ro" value="37.20" readonly>
+              <span class="lg-form-unit">kN</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="catalog-footer" style="justify-content:space-between;">
+        <span style="font-size:11px;color:var(--text-muted);">● 4 řezy celkem (3 automatické + 1 vlastní)</span>
+        <div style="display:flex;gap:8px;">
+          <button class="se-btn se-btn-secondary">Zrušit</button>
+          <button class="se-btn se-btn-primary">Posoudit vše v DCE ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     5 · A4 KAPITOLA
+═══════════════════════════════════════════════════════════════ -->
+<div id="s5" class="screen">
+  <div class="a4-wrap">
+    <div class="a4-page">
+
+      <div class="chapter-title">
+        4. &nbsp; Beam Analysis
+      </div>
+
+      <div class="section-title">4.1 &nbsp; Schéma konstrukce</div>
+      <div class="a4-svg-block" title="Klikněte pro úpravu geometrie" onclick="alert('Otevře BeamAnalysisDialog → Tab Geometrie')">
+        <svg viewBox="0 0 600 130" width="100%" style="height:110px;">
+          <rect x="20" y="30" width="12" height="70" fill="#9e9890"/>
+          <line x1="8" y1="30" x2="8" y2="100" stroke="#9e9890" stroke-width="1.8"/>
+          <line x1="2" y1="36" x2="12" y2="28" stroke="#9e9890" stroke-width="1"/><line x1="2" y1="50" x2="12" y2="42" stroke="#9e9890" stroke-width="1"/>
+          <line x1="2" y1="64" x2="12" y2="56" stroke="#9e9890" stroke-width="1"/><line x1="2" y1="78" x2="12" y2="70" stroke="#9e9890" stroke-width="1"/>
+          <line x1="2" y1="92" x2="12" y2="84" stroke="#9e9890" stroke-width="1"/>
+          <line x1="32" y1="65" x2="540" y2="65" stroke="#2c2a26" stroke-width="5" stroke-linecap="round"/>
+          <polygon points="540,65 558,80 522,80" fill="none" stroke="#2c2a26" stroke-width="1.8"/>
+          <line x1="514" y1="82" x2="566" y2="82" stroke="#9e9890" stroke-width="1.5"/>
+          <line x1="510" y1="87" x2="519" y2="82" stroke="#9e9890" stroke-width="1.2"/>
+          <line x1="523" y1="87" x2="532" y2="82" stroke="#9e9890" stroke-width="1.2"/>
+          <line x1="536" y1="87" x2="545" y2="82" stroke="#9e9890" stroke-width="1.2"/>
+          <line x1="549" y1="87" x2="558" y2="82" stroke="#9e9890" stroke-width="1.2"/>
+          <circle cx="32" cy="65" r="4" fill="#c45d3e"/>
+          <circle cx="540" cy="65" r="4" fill="#c45d3e"/>
+          <text x="285" y="55" text-anchor="middle" font-size="11" fill="#6b6760" font-family="DM Sans,sans-serif">e1 · IPE 300 · S355</text>
+          <line x1="32" y1="105" x2="540" y2="105" stroke="#9e9890" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="32" y1="100" x2="32" y2="110" stroke="#9e9890" stroke-width="1.5"/>
+          <line x1="540" y1="100" x2="540" y2="110" stroke="#9e9890" stroke-width="1.5"/>
+          <text x="285" y="120" text-anchor="middle" font-size="11" fill="#6b6760" font-family="DM Sans,sans-serif">L = 8.00 m</text>
+        </svg>
+      </div>
+
+      <div class="section-title">4.2 &nbsp; Zatížení</div>
+      <div class="a4-svg-block" title="Klikněte pro úpravu zatížení" onclick="alert('Otevře BeamAnalysisDialog → Tab Zatížení')">
+        <svg viewBox="0 0 600 110" width="100%" style="height:90px;">
+          <line x1="32" y1="20" x2="540" y2="20" stroke="#3e7ec4" stroke-width="1.5"/>
+          <text x="285" y="14" text-anchor="middle" font-size="10" fill="#3e7ec4" font-family="DM Sans,sans-serif">wy = −12.0 kN/m (LC1 Dead)</text>
+          <line x1="60"  y1="20" x2="60"  y2="60" stroke="#3e7ec4" stroke-width="1"/>
+          <line x1="120" y1="20" x2="120" y2="60" stroke="#3e7ec4" stroke-width="1"/>
+          <line x1="180" y1="20" x2="180" y2="60" stroke="#3e7ec4" stroke-width="1"/>
+          <line x1="240" y1="20" x2="240" y2="60" stroke="#3e7ec4" stroke-width="1"/>
+          <line x1="300" y1="20" x2="300" y2="60" stroke="#3e7ec4" stroke-width="1"/>
+          <line x1="360" y1="20" x2="360" y2="60" stroke="#3e7ec4" stroke-width="1"/>
+          <line x1="420" y1="20" x2="420" y2="60" stroke="#3e7ec4" stroke-width="1"/>
+          <line x1="480" y1="20" x2="480" y2="60" stroke="#3e7ec4" stroke-width="1"/>
+          <line x1="285" y1="5" x2="285" y2="60" stroke="#c45d3e" stroke-width="2"/>
+          <text x="295" y="10" font-size="10" fill="#c45d3e" font-family="DM Sans,sans-serif">Fy=−50kN (LC2)</text>
+          <rect x="20" y="30" width="12" height="40" fill="#9e9890"/>
+          <line x1="32" y1="62" x2="540" y2="62" stroke="#2c2a26" stroke-width="4" stroke-linecap="round"/>
+          <polygon points="540,62 556,74 524,74" fill="none" stroke="#2c2a26" stroke-width="1.6"/>
+        </svg>
+      </div>
+
+      <table class="a4-table">
+        <thead>
+          <tr>
+            <th>LC</th><th>Typ</th><th>Směr</th><th>Hodnota</th><th>Od [m]</th><th>Do [m]</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>LC1 Dead</td><td>Uniform</td><td>Local</td>
+            <td class="num">wy = −12.0 kN/m</td><td class="num">0.0</td><td class="num">8.0</td>
+          </tr>
+          <tr>
+            <td>LC2 Live</td><td>Point</td><td>Global</td>
+            <td class="num">Fy = −50.0 kN</td><td class="num">4.0</td><td class="num">—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-title">4.3 &nbsp; Vnitřní síly — ULS1</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="a4-svg-block" style="cursor:default;" title="M diagram">
+          <svg viewBox="0 0 270 100" width="100%" style="height:85px;">
+            <text x="4" y="12" font-size="9" fill="#6b6760" font-family="DM Sans,sans-serif">M [kNm]</text>
+            <rect x="10" y="10" width="14" height="36" fill="#9e9890"/>
+            <line x1="4" y1="10" x2="4" y2="46" stroke="#9e9890" stroke-width="1.5"/>
+            <line x1="24" y1="28" x2="240" y2="28" stroke="#2c2a26" stroke-width="3.5" stroke-linecap="round"/>
+            <polygon points="240,28 251,36 229,36" fill="none" stroke="#2c2a26" stroke-width="1.5"/>
+            <path d="M24,28 Q132,72 240,28" fill="rgba(196,93,62,.2)" stroke="#c45d3e" stroke-width="1.5"/>
+            <rect x="10" y="10" width="14" height="18" fill="rgba(74,140,92,.15)" stroke="#4a8c5c" stroke-width="1"/>
+            <line x1="132" y1="72" x2="132" y2="28" stroke="#c45d3e" stroke-width="1" stroke-dasharray="3,2"/>
+            <text x="138" y="75" font-size="9" fill="#c45d3e" font-weight="700" font-family="DM Sans,sans-serif">★62.5</text>
+            <text x="4" y="10" font-size="8" fill="#4a8c5c" font-family="DM Sans,sans-serif">−24.0</text>
+          </svg>
+        </div>
+        <div class="a4-svg-block" style="cursor:default;" title="V diagram">
+          <svg viewBox="0 0 270 100" width="100%" style="height:85px;">
+            <text x="4" y="12" font-size="9" fill="#6b6760" font-family="DM Sans,sans-serif">V [kN]</text>
+            <rect x="10" y="10" width="14" height="36" fill="#9e9890"/>
+            <line x1="4" y1="10" x2="4" y2="46" stroke="#9e9890" stroke-width="1.5"/>
+            <line x1="24" y1="28" x2="240" y2="28" stroke="#2c2a26" stroke-width="3.5" stroke-linecap="round"/>
+            <polygon points="240,28 251,36 229,36" fill="none" stroke="#2c2a26" stroke-width="1.5"/>
+            <rect x="24" y="28" width="108" height="30" fill="rgba(196,93,62,.18)" stroke="#c45d3e" stroke-width="1.5"/>
+            <rect x="132" y="8" width="108" height="20" fill="rgba(74,140,92,.18)" stroke="#4a8c5c" stroke-width="1.5"/>
+            <text x="30" y="68" font-size="9" fill="#c45d3e" font-weight="700" font-family="DM Sans,sans-serif">37.2</text>
+            <text x="138" y="8" font-size="9" fill="#4a8c5c" font-weight="700" font-family="DM Sans,sans-serif">−12.8</text>
+          </svg>
+        </div>
+      </div>
+
+      <table class="a4-table">
+        <thead>
+          <tr>
+            <th>Řez</th><th>x [m]</th><th>Komb.</th><th>N_Ed [kN]</th><th>M_Ed [kNm]</th><th>V_Ed [kN]</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="extreme">
+            <td>★ Mmax</td><td class="num">4.00</td><td>ULS1</td>
+            <td class="num">−1.2</td><td class="num">62.50</td><td class="num">37.20</td>
+          </tr>
+          <tr>
+            <td>★ Mmin</td><td class="num">0.00</td><td>ULS2</td>
+            <td class="num">−0.8</td><td class="num">−24.00</td><td class="num">48.10</td>
+          </tr>
+          <tr>
+            <td>+ Vlastní</td><td class="num">2.50</td><td>ULS1</td>
+            <td class="num">−1.2</td><td class="num">48.30</td><td class="num">37.20</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── JS ──────────────────────────────────────────────────────── -->
+<script>
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

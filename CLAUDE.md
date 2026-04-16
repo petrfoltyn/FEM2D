@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-FEALiTE2D is a fast and reliable 2D finite element analysis (FEA) library for frame, beam, and truss elements, written in C# (.NET 8) and published as a NuGet package.
+FEALiTE2D is a fast and reliable 2D finite element analysis (FEA) library for frame, beam, and truss elements, written in C# (.NET 10 LTS) and published as a NuGet package. A stateless HTTP API (`FEALiTE2D.Api`) and shared DTO contracts (`FEALiTE2D.Api.Contracts`) live in the same solution.
 
 ## Build & Test Commands
 
@@ -35,9 +35,9 @@ dotnet test FEALiTE2D.sln
 dotnet test FEALiTE2D.Tests/FEALiTE2D.Tests.csproj --filter "FullyQualifiedName~StructureTest"
 ```
 
-**Test framework**: NUnit 3 (`FEALiTE2D.Tests/` cílí na `net8.0`)
+**Test framework**: NUnit 3 (`FEALiTE2D.Tests/` cílí na `net10.0`)
 
-**Target framework**: Všechny projekty cílí na `net8.0`. NuGet balíčky jsou generovány automaticky při buildu (`GeneratePackageOnBuild=true`).
+**Target framework**: Všechny projekty cílí na `net10.0` (LTS). SDK verze je pinnutá v `global.json`. NuGet balíčky jsou generovány automaticky při buildu (`GeneratePackageOnBuild=true`).
 
 ## Build infrastruktura
 
@@ -57,9 +57,9 @@ Veškeré sestavené binárky jdou do `/out/` (ignorováno v `.gitignore`):
 
 ```
 out/
-  FEALiTE2D/Release/net8.0/        ← binárky hlavní knihovny
-  FEALiTE2D.Plotting/Release/net8.0/
-  FEALiTE2D.Tests/Debug/net8.0/
+  FEALiTE2D/Release/net10.0/        ← binárky hlavní knihovny
+  FEALiTE2D.Plotting/Release/net10.0/
+  FEALiTE2D.Tests/Debug/net10.0/
   packages/                         ← .nupkg soubory obou knihoven
 ```
 
@@ -67,11 +67,13 @@ out/
 
 ## Architecture
 
-The solution has three projects:
+The solution has five projects:
 
 - **FEALiTE2D** — core library
-- **FEALiTE2D.Tests** — NUnit test suite
 - **FEALiTE2D.Plotting** — optional DXF diagram output (depends on netDxf)
+- **FEALiTE2D.Api.Contracts** — DTO classes + JSON contract + DTO↔domain mapping (`StructureBuilder`, `ResultMapper`, `AnalysisService`) + request validator
+- **FEALiTE2D.Api** — ASP.NET Core minimal API host: `POST /api/v1/analyze`, `GET /health`, Swagger UI in Development
+- **FEALiTE2D.Tests** — NUnit test suite (covers core library + API integration via `WebApplicationFactory<Program>`)
 
 ### Core Library Namespaces
 
@@ -126,6 +128,14 @@ The solution has three projects:
 | `CSparse` | Sparse matrix factorization/solve |
 | `MathNet.Numerics` | Numerical utilities |
 | `netDxf.netstandard` | DXF output (Plotting project only) |
+| `Swashbuckle.AspNetCore` | OpenAPI / Swagger UI for the HTTP API |
+| `Microsoft.AspNetCore.Mvc.Testing` | In-memory `WebApplicationFactory` for endpoint tests |
+
+### HTTP API contract notes
+
+- JSON wire format defined by `FEALiTE2D.Api.Contracts.ApiJsonOptions` (camelCase, uppercase preserved on physical-quantity properties like `E`, `Iz`, `A`).
+- `DictionaryKeyPolicy = null` so user-supplied labels (load case names, node labels, combination factor keys) survive verbatim.
+- Polymorphic DTOs (`SupportDto`, `SectionDto`, `ElementDto`, `ElementLoadDto`) carry a `"type"` discriminator. Thanks to .NET 10 the discriminator can appear anywhere in the JSON object (`AllowOutOfOrderMetadataProperties = true`).
 
 ## Documentation
 

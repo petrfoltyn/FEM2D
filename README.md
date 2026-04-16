@@ -1,11 +1,57 @@
 # FEALiTE2D
-A fast and reliable finite element analysis library for 2D frame, beam and truss elements using C#.
+A fast and reliable finite element analysis library for 2D frame, beam and truss elements using C# (**.NET 10 LTS**).
 
 | [![NuGet](https://img.shields.io/nuget/dt/FEALiTE2D.svg)](https://www.nuget.org/packages/FEALiTE2D/) | FEALiTE2D |
 ------------ | -------------
 | [![NuGet](https://img.shields.io/nuget/dt/FEALiTE2D.Plotting.svg)](https://www.nuget.org/packages/FEALiTE2D.Plotting/) | FEALiTE2D.Plotting |
 
-## Features
+## Solution layout
+
+| Project | Purpose |
+|---|---|
+| `FEALiTE2D` | core library (NuGet) |
+| `FEALiTE2D.Plotting` | DXF diagram output (NuGet) |
+| `FEALiTE2D.Api.Contracts` | DTOs + JSON contract + DTO ↔ domain mapping + validator |
+| `FEALiTE2D.Api` | ASP.NET Core minimal API host (`POST /api/v1/analyze`, `GET /health`, Swagger) |
+| `FEALiTE2D.Client` | typed `HttpClient` wrapper for the HTTP API |
+| `FEALiTE2D.Tests` | NUnit (core + integration via `WebApplicationFactory<Program>`) |
+
+See [`docs/rest-api-design.md`](docs/rest-api-design.md) for the full API contract and [`docs/HANDOFF.md`](docs/HANDOFF.md) for project state and open work.
+
+## Build & test
+
+```powershell
+.\build\build.ps1                 # Release build
+.\build\test.ps1                  # all tests
+.\build\clean.ps1                 # wipe /out
+```
+
+The SDK is pinned to .NET 10 via `global.json`. Outputs land under `/out/<Project>/<Config>/<TFM>/` and NuGet packages under `/out/packages/`.
+
+## REST API quick start
+
+```powershell
+dotnet run --project FEALiTE2D.Api
+# → http://localhost:5180        (POST /api/v1/analyze)
+# → http://localhost:5180/swagger (Swagger UI, Development only)
+```
+
+```csharp
+using FEALiTE2D.Client;
+services.AddFealiteApiClient(o => o.BaseAddress = new Uri("http://localhost:5180/"));
+
+// later, anywhere DI is available:
+public class MyService(FealiteApiClient api)
+{
+    public async Task RunAsync(AnalysisRequest request)
+    {
+        AnalysisResponse response = await api.AnalyzeAsync(request);
+        // response.Status, response.Errors, response.LoadCaseResults[...] …
+    }
+}
+```
+
+## Core library features
 * [x] Analysis of frame, beam, truss/link members.
 * [x] Various load types:
   * [x] Frame point load.

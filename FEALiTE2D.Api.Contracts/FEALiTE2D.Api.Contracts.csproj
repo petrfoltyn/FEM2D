@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<Description>Data transfer objects (DTOs), JSON contracts and mapping for the FEALiTE2D HTTP API.</Description>
+		<PackageTags>fealite2d api dto contracts json structural-analysis</PackageTags>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>0.1.0</Version>
+		<PackageReleaseNotes>Initial API contracts: request/response DTOs, structure builder, result mapper, validator.</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FEALiTE2D\FEALiTE2D.csproj" />
+	</ItemGroup>
+
+</Project>

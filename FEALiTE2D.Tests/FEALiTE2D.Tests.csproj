@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
@@ -10,11 +10,15 @@
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FEALiTE2D.Plotting\FEALiTE2D.Plotting.csproj" />
     <ProjectReference Include="..\FEALiTE2D\FEALiTE2D.csproj" />
+    <ProjectReference Include="..\FEALiTE2D.Api.Contracts\FEALiTE2D.Api.Contracts.csproj" />
+    <ProjectReference Include="..\FEALiTE2D.Api\FEALiTE2D.Api.csproj" />
+    <ProjectReference Include="..\FEALiTE2D.Client\FEALiTE2D.Client.csproj" />
   </ItemGroup>
 
 </Project>

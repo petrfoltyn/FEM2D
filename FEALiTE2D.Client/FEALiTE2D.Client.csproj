@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<Description>Typed HttpClient for the FEALiTE2D HTTP API. Reuses FEALiTE2D.Api.Contracts DTOs.</Description>
+		<PackageTags>fealite2d api client httpclient structural-analysis</PackageTags>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>0.1.0</Version>
+		<PackageReleaseNotes>Initial typed client for FEALiTE2D API.</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FEALiTE2D.Api.Contracts\FEALiTE2D.Api.Contracts.csproj" />
+	</ItemGroup>
+
+</Project>
