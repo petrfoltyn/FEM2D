@@ -1,0 +1,37 @@
+{
+  "_comment": "Mirror of StructureTest.TestStructure2WithSettelment — same as steel-frame-kip-inch but with Uy=-1 settlement at n1. Uses default mesh (10).",
+  "nodes": [
+    { "label": "n1", "x": 0,   "y": 0,   "support": { "type": "Rigid", "ux": true, "uy": true, "rz": true } },
+    { "label": "n2", "x": 120, "y": 240 },
+    { "label": "n3", "x": 360, "y": 240, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": true } }
+  ],
+  "materials": [
+    { "label": "Concrete", "materialType": "Concrete", "E": 29000, "U": 0.2, "alpha": 0.000012, "gama": 24.53 }
+  ],
+  "sections": [
+    { "type": "Generic", "label": "S1", "materialLabel": "Concrete",
+      "A": 11.8, "Az": 11.8, "Ay": 11.8,
+      "Iz": 310, "Iy": 310, "J": 620,
+      "maxHeight": 0.1, "maxWidth": 0.1 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "S1" },
+    { "type": "Frame", "label": "e2", "startNodeLabel": "n2", "endNodeLabel": "n3", "sectionLabel": "S1" }
+  ],
+  "loadCases": [
+    {
+      "label": "live",
+      "loadCaseType": "Live",
+      "nodalLoads": [
+        { "nodeLabel": "n2", "mz": -1500, "direction": "Global" }
+      ],
+      "supportDisplacements": [
+        { "nodeLabel": "n1", "uy": -1 }
+      ],
+      "elementLoads": [
+        { "type": "Point",   "elementLabel": "e1", "fy": -90,    "l1": 134.16407864998738, "direction": "Global" },
+        { "type": "Uniform", "elementLabel": "e2", "wy": -0.125,                             "direction": "Global" }
+      ]
+    }
+  ]
+}

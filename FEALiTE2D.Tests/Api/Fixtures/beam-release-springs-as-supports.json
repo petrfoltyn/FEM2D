@@ -1,0 +1,34 @@
+{
+  "_comment": "Mirror of StructureTest.TestBeamWihEndReleaseAndSupportsAsSprings — 2-element beam, with rigid supports simulated via very stiff spring elements to the ground (n4, n5, n6).",
+  "nodes": [
+    { "label": "n1", "x": 0, "y":  0 },
+    { "label": "n2", "x": 3, "y":  0 },
+    { "label": "n3", "x": 7, "y":  0 },
+    { "label": "n4", "x": 0, "y": -1, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": true } },
+    { "label": "n5", "x": 3, "y": -1, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": true } },
+    { "label": "n6", "x": 7, "y": -1, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": true } }
+  ],
+  "materials": [
+    { "label": "Concrete", "materialType": "Concrete", "E": 30000000, "U": 0.2 }
+  ],
+  "sections": [
+    { "type": "Rectangular", "label": "S1", "materialLabel": "Concrete", "b": 0.25, "t": 0.75 }
+  ],
+  "elements": [
+    { "type": "Frame",  "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "S1" },
+    { "type": "Frame",  "label": "e2", "startNodeLabel": "n2", "endNodeLabel": "n3", "sectionLabel": "S1", "endRelease": "StartRelease" },
+    { "type": "Spring", "label": "s1", "startNodeLabel": "n1", "endNodeLabel": "n4", "K": 1e15 },
+    { "type": "Spring", "label": "s2", "startNodeLabel": "n2", "endNodeLabel": "n5", "K": 1e15 },
+    { "type": "Spring", "label": "s3", "startNodeLabel": "n3", "endNodeLabel": "n6", "K": 1e15 }
+  ],
+  "loadCases": [
+    {
+      "label": "live",
+      "loadCaseType": "Live",
+      "elementLoads": [
+        { "type": "Uniform", "elementLabel": "e1", "wy": -3.5, "direction": "Global" },
+        { "type": "Point",   "elementLabel": "e2", "fy": -6, "l1": 2, "direction": "Global" }
+      ]
+    }
+  ]
+}

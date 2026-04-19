@@ -1,0 +1,27 @@
+{
+  "_comment": "Mirror of PostProcessorTest.GetElementInternalForcesAt_WithUniformLoad — 1 m simply-supported element, full-span uniform Wy=-1 (local).",
+  "nodes": [
+    { "label": "n1", "x": 0, "y": 0, "support": { "type": "Rigid", "ux": true,  "uy": true, "rz": false } },
+    { "label": "n2", "x": 1, "y": 0, "support": { "type": "Rigid", "ux": false, "uy": true, "rz": false } }
+  ],
+  "materials": [
+    { "label": "Mat1", "materialType": "Userdefined", "E": 1000, "U": 0.3 }
+  ],
+  "sections": [
+    { "type": "Generic", "label": "S1", "materialLabel": "Mat1",
+      "A": 1, "Az": 1, "Ay": 1, "Iz": 1, "Iy": 1, "J": 1,
+      "maxHeight": 1, "maxWidth": 1 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "S1" }
+  ],
+  "loadCases": [
+    {
+      "label": "General",
+      "loadCaseType": "Dead",
+      "elementLoads": [
+        { "type": "Uniform", "elementLabel": "e1", "wy": -1, "direction": "Local" }
+      ]
+    }
+  ]
+}

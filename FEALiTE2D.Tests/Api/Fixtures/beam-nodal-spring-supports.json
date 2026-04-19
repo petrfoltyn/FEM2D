@@ -1,0 +1,28 @@
+{
+  "_comment": "Mirror of StructureTest.TestBeamWihEndReleaseAndSpringsSupports — same 2-element beam, supports modelled as NodalSpringSupport with very large stiffness (moment spring = 0 → hinge).",
+  "nodes": [
+    { "label": "n1", "x": 0, "y": 0, "support": { "type": "Spring", "kx": 1e15, "ky": 1e15, "cz": 0 } },
+    { "label": "n2", "x": 3, "y": 0, "support": { "type": "Spring", "kx": 1e15, "ky": 1e15, "cz": 0 } },
+    { "label": "n3", "x": 7, "y": 0, "support": { "type": "Spring", "kx": 1e15, "ky": 1e15, "cz": 0 } }
+  ],
+  "materials": [
+    { "label": "Concrete", "materialType": "Concrete", "E": 30000000, "U": 0.2 }
+  ],
+  "sections": [
+    { "type": "Rectangular", "label": "S1", "materialLabel": "Concrete", "b": 0.25, "t": 0.75 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "S1" },
+    { "type": "Frame", "label": "e2", "startNodeLabel": "n2", "endNodeLabel": "n3", "sectionLabel": "S1", "endRelease": "StartRelease" }
+  ],
+  "loadCases": [
+    {
+      "label": "live",
+      "loadCaseType": "Live",
+      "elementLoads": [
+        { "type": "Uniform", "elementLabel": "e1", "wy": -3.5, "direction": "Global" },
+        { "type": "Point",   "elementLabel": "e2", "fy": -6, "l1": 2, "direction": "Global" }
+      ]
+    }
+  ]
+}

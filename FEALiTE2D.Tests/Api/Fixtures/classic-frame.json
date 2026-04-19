@@ -1,0 +1,46 @@
+{
+  "_comment": "Mirror of StructureTest.TestStructure — 2-bay frame, 5 elements, support displacement + mixed loads.",
+  "nodes": [
+    { "label": "n1", "x": 0, "y": 0,  "support": { "type": "Rigid", "ux": true,  "uy": true, "rz": true } },
+    { "label": "n2", "x": 9, "y": 0,  "support": { "type": "Rigid", "ux": true,  "uy": true, "rz": true } },
+    { "label": "n3", "x": 0, "y": 6 },
+    { "label": "n4", "x": 9, "y": 6 },
+    { "label": "n5", "x": 0, "y": 12 }
+  ],
+  "materials": [
+    { "label": "Steel", "materialType": "Steel", "E": 30000000, "U": 0.2, "alpha": 0.000012, "gama": 39885 }
+  ],
+  "sections": [
+    { "type": "Generic", "label": "S1", "materialLabel": "Steel",
+      "A": 0.075, "Az": 0.075, "Ay": 0.075,
+      "Iz": 0.00048, "Iy": 0.00048, "J": 0.00096,
+      "maxHeight": 0.1, "maxWidth": 0.1 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n3", "sectionLabel": "S1" },
+    { "type": "Frame", "label": "e2", "startNodeLabel": "n2", "endNodeLabel": "n4", "sectionLabel": "S1" },
+    { "type": "Frame", "label": "e3", "startNodeLabel": "n3", "endNodeLabel": "n5", "sectionLabel": "S1" },
+    { "type": "Frame", "label": "e4", "startNodeLabel": "n3", "endNodeLabel": "n4", "sectionLabel": "S1" },
+    { "type": "Frame", "label": "e5", "startNodeLabel": "n4", "endNodeLabel": "n5", "sectionLabel": "S1" }
+  ],
+  "loadCases": [
+    {
+      "label": "live",
+      "loadCaseType": "Live",
+      "nodalLoads": [
+        { "nodeLabel": "n1", "fx": 40, "direction": "Global" },
+        { "nodeLabel": "n3", "fx": 80, "direction": "Global" },
+        { "nodeLabel": "n5", "fx": 40, "direction": "Global" }
+      ],
+      "supportDisplacements": [
+        { "nodeLabel": "n2", "ux": 0.01, "uy": -0.005, "rz": -0.043633231299858237 }
+      ],
+      "elementLoads": [
+        { "type": "Point",       "elementLabel": "e3", "mz": 7.5, "l1": 3.0, "direction": "Global" },
+        { "type": "Trapezoidal", "elementLabel": "e4", "wy1": -15, "wy2": -7, "l1": 0.9, "l2": 2.7, "direction": "Global" },
+        { "type": "Uniform",     "elementLabel": "e5", "wy": -12, "direction": "Local" }
+      ]
+    }
+  ],
+  "settings": { "meshSegments": 35 }
+}

@@ -14,6 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Api\Fixtures\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FEALiTE2D.Plotting\FEALiTE2D.Plotting.csproj" />
     <ProjectReference Include="..\FEALiTE2D\FEALiTE2D.csproj" />
     <ProjectReference Include="..\FEALiTE2D.Api.Contracts\FEALiTE2D.Api.Contracts.csproj" />
