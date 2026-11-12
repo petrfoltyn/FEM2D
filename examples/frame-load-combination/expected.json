@@ -1,0 +1,97 @@
+{
+  "name": "frame-load-combination",
+  "description": "Mirror of StructureTest.TestStructureWithLoadCombination — 2-bay 2-storey frame + cantilever beams (n7, n8). Two load cases (Live, Dead) + ULS combination 1.35*Dead + 1.5*Live.",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.TestStructureWithLoadCombination (fixture Api/Fixtures/frame-load-combination.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.Live.supportReactions.n1.fx",
+      "expected": -1.0545205,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Live.supportReactions.n1.fy",
+      "expected": 30.0,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Live.supportReactions.n1.mz",
+      "expected": 0.67707616,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Live.supportReactions.n4.fx",
+      "expected": 1.0545205,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Live.supportReactions.n4.fy",
+      "expected": 30.0,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Live.supportReactions.n4.mz",
+      "expected": -0.6770761,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Dead.supportReactions.n1.fx",
+      "expected": -10.149307,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Dead.supportReactions.n1.fy",
+      "expected": -3.0919293,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Dead.supportReactions.n1.mz",
+      "expected": 15.5190549,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Dead.supportReactions.n4.fx",
+      "expected": -9.8506923,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Dead.supportReactions.n4.fy",
+      "expected": 3.09192933,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.Dead.supportReactions.n4.mz",
+      "expected": 15.205157,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCombinationResults.uls.supportReactions.n1.fx",
+      "expected": -15.283345200000001,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCombinationResults.uls.supportReactions.n1.fy",
+      "expected": 40.825895445,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCombinationResults.uls.supportReactions.n1.mz",
+      "expected": 21.966338355000005,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCombinationResults.uls.supportReactions.n4.fx",
+      "expected": -11.716653855,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCombinationResults.uls.supportReactions.n4.fy",
+      "expected": 49.1741045955,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCombinationResults.uls.supportReactions.n4.mz",
+      "expected": 19.5113478,
+      "tol": 1e-05
+    }
+  ]
+}

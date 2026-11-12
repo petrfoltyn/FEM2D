@@ -1,0 +1,22 @@
+{
+  "name": "pp-trapezoidal-full",
+  "description": "Mirror of PostProcessorTest.GetElementInternalForcesAt_WithTrapezoidalLoad — 1 m SS beam, triangular load Wy1=0, Wy2=-1 over full span.",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.PostProcessor_trapezoidal_full_span (fixture Api/Fixtures/pp-trapezoidal-full.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.General.elementForces.e1[x2=0.5].endForce.fx",
+      "expected": 0.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[x2=0.5].endForce.fy",
+      "expected": 0.041666666666666664,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[x2=0.5].endForce.mz",
+      "expected": -0.0625,
+      "tol": 0.001
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "_comment": "Mirror of StructureTest.TestStructureWithLoadCombination — 2-bay 2-storey frame + cantilever beams (n7, n8). Two load cases (Live, Dead) + ULS combination 1.35*Dead + 1.5*Live.",
+  "nodes": [
+    { "label": "n1", "x": 1, "y": 0, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": true } },
+    { "label": "n2", "x": 1, "y": 2 },
+    { "label": "n3", "x": 1, "y": 4 },
+    { "label": "n4", "x": 4, "y": 0, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": true } },
+    { "label": "n5", "x": 4, "y": 2 },
+    { "label": "n6", "x": 4, "y": 4 },
+    { "label": "n7", "x": 0, "y": 4 },
+    { "label": "n8", "x": 5, "y": 4 }
+  ],
+  "materials": [
+    { "label": "Steel", "materialType": "Steel", "E": 30000000, "U": 0.2, "alpha": 0.000012, "gama": 39885 }
+  ],
+  "sections": [
+    { "type": "Circular",    "label": "Col",  "materialLabel": "Steel", "d": 0.4 },
+    { "type": "Rectangular", "label": "Beam", "materialLabel": "Steel", "b": 0.4, "t": 0.4 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "Col"  },
+    { "type": "Frame", "label": "e2", "startNodeLabel": "n2", "endNodeLabel": "n3", "sectionLabel": "Col"  },
+    { "type": "Frame", "label": "e3", "startNodeLabel": "n4", "endNodeLabel": "n5", "sectionLabel": "Col"  },
+    { "type": "Frame", "label": "e4", "startNodeLabel": "n5", "endNodeLabel": "n6", "sectionLabel": "Col"  },
+    { "type": "Frame", "label": "e5", "startNodeLabel": "n7", "endNodeLabel": "n3", "sectionLabel": "Beam" },
+    { "type": "Frame", "label": "e6", "startNodeLabel": "n3", "endNodeLabel": "n6", "sectionLabel": "Beam" },
+    { "type": "Frame", "label": "e7", "startNodeLabel": "n6", "endNodeLabel": "n8", "sectionLabel": "Beam" },
+    { "type": "Frame", "label": "e8", "startNodeLabel": "n2", "endNodeLabel": "n5", "sectionLabel": "Beam", "endRelease": "FullRelease" }
+  ],
+  "loadCases": [
+    {
+      "label": "Live",
+      "loadCaseType": "Live",
+      "elementLoads": [
+        { "type": "Trapezoidal", "elementLabel": "e5", "wy1": 0,   "wy2": -15, "direction": "Local" },
+        { "type": "Uniform",     "elementLabel": "e6", "wy": -15,              "direction": "Local" },
+        { "type": "Trapezoidal", "elementLabel": "e7", "wy1": -15, "wy2": 0,   "direction": "Local" }
+      ]
+    },
+    {
+      "label": "Dead",
+      "loadCaseType": "Dead",
+      "nodalLoads": [
+        { "nodeLabel": "n2", "fx": 20, "direction": "Global" }
+      ]
+    }
+  ],
+  "loadCombinations": [
+    { "label": "uls", "factors": { "Dead": 1.35, "Live": 1.5 } }
+  ],
+  "settings": { "meshSegments": 30 }
+}

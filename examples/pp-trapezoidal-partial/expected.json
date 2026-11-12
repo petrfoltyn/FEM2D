@@ -1,0 +1,27 @@
+{
+  "name": "pp-trapezoidal-partial",
+  "description": "Partial triangular load 0 -> 1 on <0.25, 0.75>: R1 = 0.104167, R2 = 0.145833; at x = 0.5: V = 0.041667, M = 0.046875 (sagging -> Mz = -M).",
+  "source": "FEALiTE2D.Tests/Structure/PostProcessorTest.GetElementInternalForcesAt_WithPartialTrapezoidalLoad_ReturnCorrectForce (no asserts there) - expected values analytical",
+  "checks": [
+    {
+      "path": "loadCaseResults.General.supportReactions.n1.fy",
+      "expected": 0.10416666666666669,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.General.supportReactions.n2.fy",
+      "expected": 0.14583333333333331,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[x2=0.5].endForce.fy",
+      "expected": 0.041666666666666685,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[x2=0.5].endForce.mz",
+      "expected": -0.04687500000000001,
+      "tol": 1e-06
+    }
+  ]
+}

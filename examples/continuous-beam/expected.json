@@ -1,0 +1,116 @@
+{
+  "name": "continuous-beam",
+  "description": "Mirror of FEALiTE2D.Tests.Structure.StructureTest.TestContinousBeam. Reference results confirmed with Robot.",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.TestContinousBeam (fixture Api/Fixtures/continuous-beam.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n1.ux",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n1.uy",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n1.rz",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n2.ux",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n2.uy",
+      "expected": -0.004472862720851618,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n2.rz",
+      "expected": 0.0005614327045208637,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n3.ux",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n3.uy",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n3.rz",
+      "expected": -0.0006841653841759686,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n4.ux",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n4.uy",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n4.rz",
+      "expected": 0.0032284743177037486,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n2",
+      "absent": true
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n1.fx",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n1.fy",
+      "expected": 146.3269099590723,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n1.mz",
+      "expected": 281.18656207366985,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n3.fx",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n3.fy",
+      "expected": 243.46483628922235,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n3.mz",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n4.fx",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n4.fy",
+      "expected": 50.208253751705314,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n4.mz",
+      "expected": 0.0,
+      "tol": 1e-06
+    }
+  ]
+}

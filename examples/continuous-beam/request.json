@@ -1,0 +1,45 @@
+{
+  "_comment": "Mirror of FEALiTE2D.Tests.Structure.StructureTest.TestContinousBeam. Reference results confirmed with Robot.",
+  "nodes": [
+    { "label": "n1", "x": 0,  "y": 0, "support": { "type": "Rigid", "ux": true,  "uy": true, "rz": true  } },
+    { "label": "n2", "x": 6,  "y": 0 },
+    { "label": "n3", "x": 10, "y": 0, "support": { "type": "Rigid", "ux": false, "uy": true, "rz": false } },
+    { "label": "n4", "x": 20, "y": 0, "support": { "type": "Rigid", "ux": false, "uy": true, "rz": false } }
+  ],
+  "materials": [
+    { "label": "Concrete", "materialType": "Concrete", "E": 28000000, "U": 0.2 }
+  ],
+  "sections": [
+    { "type": "Generic", "label": "S1", "materialLabel": "Concrete",
+      "A": 0.03228, "Az": 0.03228, "Ay": 0.03228,
+      "Iz": 0.0058, "Iy": 0.0058, "J": 0,
+      "maxHeight": 0, "maxWidth": 0 },
+    { "type": "Generic", "label": "S2", "materialLabel": "Concrete",
+      "A": 0.04842, "Az": 0.04842, "Ay": 0.2451,
+      "Iz": 0.0087, "Iy": 0.0087, "J": 0,
+      "maxHeight": 0, "maxWidth": 0 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "S2" },
+    { "type": "Frame", "label": "e2", "startNodeLabel": "n2", "endNodeLabel": "n3", "sectionLabel": "S1" },
+    { "type": "Frame", "label": "e3", "startNodeLabel": "n3", "endNodeLabel": "n4", "sectionLabel": "S1" }
+  ],
+  "loadCases": [
+    {
+      "label": "live",
+      "loadCaseType": "Live",
+      "nodalLoads": [
+        { "nodeLabel": "n2", "fx": 0, "fy": -200, "mz": 0,   "direction": "Global" },
+        { "nodeLabel": "n3", "fx": 0, "fy": 0,    "mz": -90, "direction": "Global" }
+      ],
+      "elementLoads": [
+        { "type": "Trapezoidal", "elementLabel": "e1",
+          "wx1": 0, "wx2": 0, "wy1": -30, "wy2": 0,
+          "l1": 0, "l2": 0, "direction": "Global" },
+        { "type": "Point", "elementLabel": "e3",
+          "fx": 0, "fy": -150, "mz": 0, "l1": 5, "direction": "Global" }
+      ]
+    }
+  ],
+  "settings": { "meshSegments": 20 }
+}

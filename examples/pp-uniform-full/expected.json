@@ -1,0 +1,37 @@
+{
+  "name": "pp-uniform-full",
+  "description": "Mirror of PostProcessorTest.GetElementInternalForcesAt_WithUniformLoad — 1 m simply-supported element, full-span uniform Wy=-1 (local).",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.PostProcessor_uniform_full_span (fixture Api/Fixtures/pp-uniform-full.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.General.elementForces.e1[0].startForce.fx",
+      "expected": 0.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[0].startForce.fy",
+      "expected": 0.5,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[0].startForce.mz",
+      "expected": 0.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[-1].endForce.fx",
+      "expected": 0.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[-1].endForce.fy",
+      "expected": -0.5,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[-1].endForce.mz",
+      "expected": 0.0,
+      "tol": 0.001
+    }
+  ]
+}

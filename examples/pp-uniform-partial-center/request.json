@@ -1,0 +1,27 @@
+{
+  "_comment": "Mirror of PostProcessorTest.GetElementInternalForcesAt_WithPartialUniformLoad_ReturnsCorrectForce — 1 m SS beam, uniform Wy=-1 applied from a=0.25 to 0.75 (b=0.5, c=0.25). Expected Mmax = 0.09375 at x=0.5.",
+  "nodes": [
+    { "label": "n1", "x": 0, "y": 0, "support": { "type": "Rigid", "ux": true,  "uy": true, "rz": false } },
+    { "label": "n2", "x": 1, "y": 0, "support": { "type": "Rigid", "ux": false, "uy": true, "rz": false } }
+  ],
+  "materials": [
+    { "label": "Mat1", "materialType": "Userdefined", "E": 1000, "U": 0.3 }
+  ],
+  "sections": [
+    { "type": "Generic", "label": "S1", "materialLabel": "Mat1",
+      "A": 1, "Az": 1, "Ay": 1, "Iz": 1, "Iy": 1, "J": 1,
+      "maxHeight": 1, "maxWidth": 1 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "S1" }
+  ],
+  "loadCases": [
+    {
+      "label": "General",
+      "loadCaseType": "Dead",
+      "elementLoads": [
+        { "type": "Uniform", "elementLabel": "e1", "wy": -1, "l1": 0.25, "l2": 0.25, "direction": "Local" }
+      ]
+    }
+  ]
+}

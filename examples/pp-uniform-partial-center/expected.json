@@ -1,0 +1,17 @@
+{
+  "name": "pp-uniform-partial-center",
+  "description": "Mirror of PostProcessorTest.GetElementInternalForcesAt_WithPartialUniformLoad_ReturnsCorrectForce — 1 m SS beam, uniform Wy=-1 applied from a=0.25 to 0.75 (b=0.5, c=0.25). Expected Mmax = 0.09375 at x=0.5.",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.PostProcessor_uniform_partial_center (fixture Api/Fixtures/pp-uniform-partial-center.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.General.elementForces.e1[x2=0.5].endForce.fy",
+      "expected": 0.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[x2=0.5].endForce.mz",
+      "expected": -0.09375,
+      "tol": 0.001
+    }
+  ]
+}

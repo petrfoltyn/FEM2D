@@ -1,0 +1,62 @@
+{
+  "name": "truss-spring-support",
+  "description": "Mirror of StructureTest.TestTrussWithSpringElementAsSupport — 2 fully-released frame members + 1 spring support converging at n1.",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.TestTrussWithSpringElementAsSupport (fixture Api/Fixtures/truss-spring-support.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.ll.nodeDisplacements.n1.ux",
+      "expected": -0.00344827586206897,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.ll.nodeDisplacements.n1.uy",
+      "expected": -0.00689655172413793,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n2.fx",
+      "expected": -36.20689655172414,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n2.fy",
+      "expected": 36.20689655172414,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n2.mz",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n3.fx",
+      "expected": 36.206896551724135,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n3.fy",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n3.mz",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n4.fx",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n4.fy",
+      "expected": 13.793103448275861,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.ll.supportReactions.n4.mz",
+      "expected": 0.0,
+      "tol": 1e-06
+    }
+  ]
+}

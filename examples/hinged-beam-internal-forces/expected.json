@@ -1,0 +1,61 @@
+{
+  "name": "hinged-beam-internal-forces",
+  "description": "Mirror of StructureTest.TestInternalForces — 2 elements, both hinged, partial trapezoidal with Wx!=0.",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.TestInternalForces_hinged_beam (fixture Api/Fixtures/hinged-beam-internal-forces.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.live.elementForces.e1",
+      "count": 11
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[0].startForce.fy",
+      "expected": 24.553854166666675,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[0].endForce.fy",
+      "expected": 24.553854166666675,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[3].endForce.fy",
+      "expected": 22.55351170091325,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[4].startForce.fy",
+      "expected": 22.55351170091325,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[4].endForce.fy",
+      "expected": 16.24186786529681,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[6].endForce.fy",
+      "expected": 5.262415810502288,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[0].startForce.mz",
+      "expected": 0.0,
+      "tol": 1e-08
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[0].endForce.mz",
+      "expected": -12.276927083333323,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[5].endForce.mz",
+      "expected": -53.01333119292239,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.elementForces.e1[6].endForce.mz",
+      "expected": -56.92564640410959,
+      "tol": 1e-06
+    }
+  ]
+}

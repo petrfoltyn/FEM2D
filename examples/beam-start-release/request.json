@@ -1,0 +1,29 @@
+{
+  "_comment": "Mirror of StructureTest.TestBeamWihEndRelease — 2-element beam, the second element has a moment release at its start end. Labels match the original (second element label is 'e3').",
+  "nodes": [
+    { "label": "n1", "x": 0, "y": 0, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": false } },
+    { "label": "n2", "x": 3, "y": 0, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": false } },
+    { "label": "n3", "x": 7, "y": 0, "support": { "type": "Rigid", "ux": true, "uy": true, "rz": false } }
+  ],
+  "materials": [
+    { "label": "Concrete", "materialType": "Concrete", "E": 30000000, "U": 0.2 }
+  ],
+  "sections": [
+    { "type": "Rectangular", "label": "S1", "materialLabel": "Concrete", "b": 0.25, "t": 0.75 }
+  ],
+  "elements": [
+    { "type": "Frame", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n2", "sectionLabel": "S1" },
+    { "type": "Frame", "label": "e3", "startNodeLabel": "n2", "endNodeLabel": "n3", "sectionLabel": "S1", "endRelease": "StartRelease" }
+  ],
+  "loadCases": [
+    {
+      "label": "live",
+      "loadCaseType": "Live",
+      "elementLoads": [
+        { "type": "Uniform", "elementLabel": "e1", "wy": -3.5, "direction": "Global" },
+        { "type": "Point",   "elementLabel": "e3", "fy": -6, "l1": 2, "direction": "Global" }
+      ]
+    }
+  ],
+  "settings": { "meshSegments": 50 }
+}

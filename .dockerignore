@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+out/
+_site/
+api/
+.git/
+.vs/
+.idea/
+**/*.user
+FEALiTE2D.Tests/
+FEALiTE2D.Plotting/
+FEALiTE2D.Client/
+docs/

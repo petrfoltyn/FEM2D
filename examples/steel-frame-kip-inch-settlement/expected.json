@@ -1,0 +1,52 @@
+{
+  "name": "steel-frame-kip-inch-settlement",
+  "description": "Mirror of StructureTest.TestStructure2WithSettelment — same as steel-frame-kip-inch but with Uy=-1 settlement at n1. Uses default mesh (10).",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.TestStructure2_with_settlement (fixture Api/Fixtures/steel-frame-kip-inch-settlement.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n1.ux",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n1.uy",
+      "expected": -1.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n1.rz",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n3.ux",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n3.uy",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n3.rz",
+      "expected": 0.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n2.ux",
+      "expected": 0.017760708393401745,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n2.uy",
+      "expected": -1.059915467868475,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n2.rz",
+      "expected": 0.0007419163871506202,
+      "tol": 1e-09
+    }
+  ]
+}

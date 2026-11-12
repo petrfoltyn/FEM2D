@@ -1,0 +1,67 @@
+{
+  "name": "beam-release-springs-as-supports",
+  "description": "Mirror of StructureTest.TestBeamWihEndReleaseAndSupportsAsSprings — 2-element beam, with rigid supports simulated via very stiff spring elements to the ground (n4, n5, n6).",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.TestBeamWithEndReleaseAndSupportsAsSprings (fixture Api/Fixtures/beam-release-springs-as-supports.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n1.rz",
+      "expected": -1.49333333333e-05,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n2.rz",
+      "expected": 1.49333333333e-05,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.live.nodeDisplacements.n3.rz",
+      "expected": 2.27555555557e-05,
+      "tol": 1e-05
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n4.fx",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n4.fy",
+      "expected": 5.25,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n4.mz",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n5.fx",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n5.fy",
+      "expected": 8.25,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n5.mz",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n6.fx",
+      "expected": 0.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n6.fy",
+      "expected": 3.0,
+      "tol": 1e-06
+    },
+    {
+      "path": "loadCaseResults.live.supportReactions.n6.mz",
+      "expected": 0.0,
+      "tol": 1e-06
+    }
+  ]
+}

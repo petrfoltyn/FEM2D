@@ -1,0 +1,27 @@
+{
+  "name": "pp-uniform-partial-edge",
+  "description": "Mirror of PostProcessorTest.GetElementInternalForcesAt_WithPartialUniformLoad_EdgeSegment — partial uniform load, 4 mesh segments, check end force at x=1.",
+  "source": "FEALiTE2D.Tests/Api/JsonWorkflowTest.PostProcessor_uniform_partial_edge_segment (fixture Api/Fixtures/pp-uniform-partial-edge.json)",
+  "checks": [
+    {
+      "path": "loadCaseResults.General.elementForces.e1[-1].x2",
+      "expected": 1.0,
+      "tol": 1e-09
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[-1].endForce.fx",
+      "expected": 0.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[-1].endForce.fy",
+      "expected": 0.0737,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.General.elementForces.e1[-1].endForce.mz",
+      "expected": 0.0,
+      "tol": 0.001
+    }
+  ]
+}

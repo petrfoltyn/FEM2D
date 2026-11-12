@@ -1,0 +1,47 @@
+{
+  "name": "fixed-end-beam",
+  "description": "Fixed-fixed beam, uniform load: reactions qL/2 = 2000 N, end moments qL^2/12 = 1 666 666.7 Nmm, midspan qL^2/24 = 833 333.3 Nmm (sagging = negative Mz of the segment end force, hogging positive).",
+  "source": "FEALiTE2D.Tests/Structure/StructureTest.TestFixedEndBeam (no asserts there) - expected values analytical",
+  "checks": [
+    {
+      "path": "loadCaseResults.G.supportReactions.n1.fy",
+      "expected": 2000.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.G.supportReactions.n2.fy",
+      "expected": 2000.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.G.supportReactions.n1.mz",
+      "expected": 1666666.6666666667,
+      "tol": 1.0
+    },
+    {
+      "path": "loadCaseResults.G.supportReactions.n2.mz",
+      "expected": -1666666.6666666667,
+      "tol": 1.0
+    },
+    {
+      "path": "loadCaseResults.G.elementForces.e1[0].startForce.mz",
+      "expected": 1666666.6666666667,
+      "tol": 1.0
+    },
+    {
+      "path": "loadCaseResults.G.elementForces.e1[x2=2500].endForce.fy",
+      "expected": 0.0,
+      "tol": 0.001
+    },
+    {
+      "path": "loadCaseResults.G.elementForces.e1[x2=2500].endForce.mz",
+      "expected": -833333.3333333334,
+      "tol": 1.0
+    },
+    {
+      "path": "loadCaseResults.G.nodeDisplacements.n2.rz",
+      "expected": 0.0,
+      "tol": 1e-12
+    }
+  ]
+}

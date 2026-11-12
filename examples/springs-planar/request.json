@@ -1,0 +1,25 @@
+{
+  "_comment": "Mirror of StructureTest.TestSprings — 3 radial springs support an Rz-only restrained node. Original test duplicated label 'n3'; here the free node is relabeled 'n4'.",
+  "nodes": [
+    { "label": "n1", "x": 0, "y": 0,  "support": { "type": "Rigid", "ux": true,  "uy": true,  "rz": true } },
+    { "label": "n2", "x": 0, "y": -5, "support": { "type": "Rigid", "ux": true,  "uy": true,  "rz": true } },
+    { "label": "n3", "x": 0, "y": 5,  "support": { "type": "Rigid", "ux": true,  "uy": true,  "rz": true } },
+    { "label": "n4", "x": 5, "y": 0,  "support": { "type": "Rigid", "ux": false, "uy": false, "rz": true } }
+  ],
+  "materials": [],
+  "sections": [],
+  "elements": [
+    { "type": "Spring", "label": "e1", "startNodeLabel": "n1", "endNodeLabel": "n4", "K": 1000 },
+    { "type": "Spring", "label": "e2", "startNodeLabel": "n2", "endNodeLabel": "n4", "K": 1000 },
+    { "type": "Spring", "label": "e3", "startNodeLabel": "n3", "endNodeLabel": "n4", "K": 1000 }
+  ],
+  "loadCases": [
+    {
+      "label": "live",
+      "loadCaseType": "Live",
+      "nodalLoads": [
+        { "nodeLabel": "n4", "fy": -100, "direction": "Global" }
+      ]
+    }
+  ]
+}
