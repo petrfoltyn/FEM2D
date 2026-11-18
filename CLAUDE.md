@@ -67,13 +67,14 @@ out/
 
 ## Architecture
 
-The solution has five projects:
+The solution has six main projects:
 
 - **FEALiTE2D** — core library
 - **FEALiTE2D.Plotting** — optional DXF diagram output (depends on netDxf)
 - **FEALiTE2D.Api.Contracts** — DTO classes + JSON contract + DTO↔domain mapping (`StructureBuilder`, `ResultMapper`, `AnalysisService`) + request validator
 - **FEALiTE2D.Api** — ASP.NET Core minimal API host: `POST /api/v1/analyze`, `GET /health`, Swagger UI in Development
-- **FEALiTE2D.Tests** — NUnit test suite (covers core library + API integration via `WebApplicationFactory<Program>`)
+- **FEALiTE2D.Tda** — the same `AnalysisRequest` solved by TDA (d:\Repos\TDA, `tda` CLI via `TdaCliSolver`): `TdaAnalysisService.Analyze` → without `TimeDependent` linear elastic load cases (one TDA run per case, = FEALiTE2D up to single precision), with it one run over the construction stages → `AnalysisResponse.TimeDependentResults`. Element loads → consistent nodal loads + fixed-end forces, segments on the FEALiTE2D mesh, composite members (request element + parallel `AdditionalElements`) → resultant about the node axis in `ElementForces`, parts in `PartForces`. Concrete: cast in TDA at `CastingTime`, stiff from the activating stage, EN 2023 aggregate modulus calibrated to the request E. TDA units kN/kPa inside, SI outside.
+- **FEALiTE2D.Tests** — NUnit test suite (covers core library + API integration via `WebApplicationFactory<Program>`); `Tda/TdaAnalysisTest` runs the 13 non-spring `examples/` through TDA and the time-dependent fixtures of `Api/TimeDependentContractTest` (needs the TDA executable: env `TDA_EXE` or `../TDA/build-win/Release/tda.exe`, otherwise ignored)
 
 ### Core Library Namespaces
 
@@ -135,6 +136,8 @@ The solution has five projects:
 
 - JSON wire format defined by `FEALiTE2D.Api.Contracts.ApiJsonOptions` (camelCase, uppercase preserved on physical-quantity properties like `E`, `Iz`, `A`).
 - `DictionaryKeyPolicy = null` so user-supplied labels (load case names, node labels, combination factor keys) survive verbatim.
+- `AnalysisRequest.TimeDependent` (optional, `Requests/TimeDependentDto.cs`) = data for the time-dependent solver TDA (d:\Repos\TDA) over the same structure: rheology model, humidity, concrete creep properties per material, drying per section, element age and eccentricity (`OffsetStart/End`, local y), `AdditionalElements` (TDA-only parallel members between the same nodes: tendons, composite slab), construction stages (activate/deactivate elements, add/remove supports, load cases applied, prestress σp0 of steel elements), time axis; times in days. A node whose supports no stage mentions gets `nodes[].support` in the first stage. FEALiTE2D ignores it and keeps the simple model (its result = instantaneous response at 28 days), but the validator checks it, so an invalid extension fails the whole request. Not supported with it: spring supports/elements, rotated supports.
+- `AnalysisResponse.TimeDependentResults` (`Responses/TimeDependentResultsDto.cs`, filled only by `FEALiTE2D.Tda`): `States` (before / after every stage, output times, end; cumulative), `Effects` (instantaneous effect of every stage + creep and shrinkage between reported times; Σ effects = state), `Histories` (every TDA time step: node displacements / reactions, element end forces in engineering sign). Every state and effect is a `CaseResultDto` in the FEALiTE2D convention; `CaseResultDto.PartForces` = parts of a composite member in their own axes.
 - Polymorphic DTOs (`SupportDto`, `SectionDto`, `ElementDto`, `ElementLoadDto`) carry a `"type"` discriminator. Thanks to .NET 10 the discriminator can appear anywhere in the JSON object (`AllowOutOfOrderMetadataProperties = true`).
 
 ## Documentation

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using FEALiTE2D.Api.Contracts.Enums;
 using FEALiTE2D.Api.Contracts.Requests;
 
 namespace FEALiTE2D.Api.Contracts.Validation;
@@ -32,6 +34,8 @@ public sealed class AnalysisRequestValidator
         var elementLengths = ValidateElements(request, nodeLabels, sectionLabels, result);
         ValidateLoadCases(request, nodeLabels, elementLabels, elementLengths, result);
         ValidateLoadCombinations(request, loadCaseLabels, result);
+        if (request.TimeDependent is not null)
+            ValidateTimeDependent(request, nodeLabels, materialLabels, sectionLabels, elementLabels, loadCaseLabels, result);
 
         return result;
     }
@@ -197,5 +201,152 @@ public sealed class AnalysisRequestValidator
                 if (!loadCaseLabels.Contains(key))
                     result.Add($"LoadCombination '{c.Label}': factor key '{key}' is not a known loadCase label.");
         }
+    }
+
+    private static void ValidateTimeDependent(AnalysisRequest request, HashSet<string> nodeLabels,
+        HashSet<string> materialLabels, HashSet<string> sectionLabels, HashSet<string> elementLabels,
+        HashSet<string> loadCaseLabels, ValidationResult result)
+    {
+        var td = request.TimeDependent!;
+        const string p = "TimeDependent";
+
+        if (td.RelativeHumidity <= 0 || td.RelativeHumidity > 1)
+            result.Add($"{p}: relativeHumidity must be in (0, 1].");
+        if (td.AnalysisEnd <= 0) result.Add($"{p}: analysisEnd must be greater than 0.");
+        if (td.StepsPerDecade < 1) result.Add($"{p}: stepsPerDecade must be at least 1.");
+        foreach (var t in td.OutputTimes)
+            if (t < 0 || t > td.AnalysisEnd)
+                result.Add($"{p}: output time {t} is outside [0, analysisEnd].");
+
+        // features a time-dependent solver over this request does not support
+        foreach (var n in request.Nodes)
+        {
+            if (n.Support is SpringSupportDto) result.Add($"{p}: node '{n.Label}' has a spring support (not supported).");
+            if (n.RotationAngle != 0) result.Add($"{p}: node '{n.Label}' has a rotated support (not supported).");
+        }
+        foreach (var e in request.Elements)
+            if (e is SpringElementDto) result.Add($"{p}: element '{e.Label}' is a spring element (not supported).");
+
+        // concrete materials and their creep properties
+        var concreteMaterials = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var m in request.Materials)
+            if (m.MaterialType == MaterialTypeDto.Concrete) concreteMaterials.Add(m.Label);
+        var concretes = ValidateUniqueLabels(td.Concretes, c => c.MaterialLabel, $"{p}.concretes", result);
+        foreach (var c in td.Concretes)
+        {
+            if (!materialLabels.Contains(c.MaterialLabel))
+                result.Add($"{p}: concrete '{c.MaterialLabel}' is not a known material label.");
+            else if (!concreteMaterials.Contains(c.MaterialLabel))
+                result.Add($"{p}: material '{c.MaterialLabel}' is not of type Concrete.");
+            if (c.Fck <= 0) result.Add($"{p}: concrete '{c.MaterialLabel}': fck must be greater than 0.");
+        }
+        foreach (var m in concreteMaterials)
+            if (!concretes.Contains(m)) result.Add($"{p}: concrete material '{m}' has no creep properties (concretes).");
+
+        // drying of concrete sections
+        var drying = ValidateUniqueLabels(td.Sections, s => s.SectionLabel, $"{p}.sections", result);
+        foreach (var s in td.Sections)
+        {
+            if (!sectionLabels.Contains(s.SectionLabel))
+                result.Add($"{p}: section '{s.SectionLabel}' is not a known section label.");
+            var h0 = s.NotionalSize ?? 0;
+            var u = s.PerimeterExposed ?? 0;
+            if (h0 <= 0 && u <= 0)
+                result.Add($"{p}: section '{s.SectionLabel}': notionalSize or perimeterExposed must be greater than 0.");
+        }
+        foreach (var s in request.Sections)
+            if (concreteMaterials.Contains(s.MaterialLabel) && !drying.Contains(s.Label))
+                result.Add($"{p}: concrete section '{s.Label}' has no drying data (sections).");
+
+        // elements only the time-dependent solver models (tendons, slab): parallel to the request elements
+        var allElements = new HashSet<string>(elementLabels, StringComparer.Ordinal);
+        var sectionOf = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var e in request.Elements)
+            if (e is FrameElementDto f) sectionOf[f.Label] = f.SectionLabel;
+        foreach (var e in td.AdditionalElements)
+        {
+            var s = $"{p}: additional element '{e.Label}'";
+            if (string.IsNullOrWhiteSpace(e.Label)) { result.Add($"{p}: additional element with an empty label."); continue; }
+            if (!allElements.Add(e.Label)) result.Add($"{s}: duplicate element label.");
+            if (!nodeLabels.Contains(e.StartNodeLabel)) result.Add($"{s}: startNodeLabel '{e.StartNodeLabel}' not found.");
+            if (!nodeLabels.Contains(e.EndNodeLabel)) result.Add($"{s}: endNodeLabel '{e.EndNodeLabel}' not found.");
+            if (e.StartNodeLabel == e.EndNodeLabel) result.Add($"{s}: start and end node are the same.");
+            if (!sectionLabels.Contains(e.SectionLabel)) result.Add($"{s}: sectionLabel '{e.SectionLabel}' not found.");
+            sectionOf[e.Label] = e.SectionLabel;
+        }
+        var materialOfSection = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var s in request.Sections) materialOfSection[s.Label] = s.MaterialLabel;
+        var steelMaterials = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var m in request.Materials)
+            if (m.MaterialType == MaterialTypeDto.Steel) steelMaterials.Add(m.Label);
+
+        // element ages
+        var ages = new Dictionary<string, ElementAgeDto>(StringComparer.Ordinal);
+        ValidateUniqueLabels(td.Elements, e => e.ElementLabel, $"{p}.elements", result);
+        foreach (var a in td.Elements)
+        {
+            if (!allElements.Contains(a.ElementLabel))
+                result.Add($"{p}: element '{a.ElementLabel}' is not a known element label.");
+            if (a.CuringDuration < 0) result.Add($"{p}: element '{a.ElementLabel}': curingDuration must not be negative.");
+            if (a.CastingTime is < 0) result.Add($"{p}: element '{a.ElementLabel}': castingTime must not be negative.");
+            ages[a.ElementLabel] = a;
+        }
+
+        // stages: time order, references, element and load case life cycle
+        if (td.Stages.Count == 0) result.Add($"{p}: at least one stage is required.");
+        ValidateUniqueLabels(td.Stages, s => s.Label, $"{p}.stages", result);
+        var loadCases = new Dictionary<string, LoadCaseDto>(StringComparer.Ordinal);
+        foreach (var lc in request.LoadCases) loadCases[lc.Label] = lc;
+        var active = new HashSet<string>(StringComparer.Ordinal);
+        var everActive = new HashSet<string>(StringComparer.Ordinal);
+        var applied = new HashSet<string>(StringComparer.Ordinal);
+        double previous = double.NegativeInfinity;
+        foreach (var st in td.Stages)
+        {
+            var s = $"{p}: stage '{st.Label}'";
+            if (st.Time < previous) result.Add($"{s}: stages must be in time order.");
+            if (st.Time < 0 || st.Time >= td.AnalysisEnd) result.Add($"{s}: time must be in [0, analysisEnd).");
+            previous = st.Time;
+
+            foreach (var e in st.ActivateElements)
+            {
+                if (!allElements.Contains(e)) { result.Add($"{s}: unknown element '{e}'."); continue; }
+                if (!everActive.Add(e)) result.Add($"{s}: element '{e}' is activated more than once.");
+                active.Add(e);
+                if (ages.TryGetValue(e, out var a) && a.CastingTime > st.Time)
+                    result.Add($"{s}: element '{e}' is activated before its casting time.");
+            }
+            foreach (var e in st.DeactivateElements)
+                if (!active.Remove(e)) result.Add($"{s}: element '{e}' is not active.");
+
+            foreach (var sup in st.AddSupports.Concat(st.RemoveSupports))
+            {
+                if (!nodeLabels.Contains(sup.NodeLabel)) result.Add($"{s}: unknown node '{sup.NodeLabel}'.");
+                if (!sup.Ux && !sup.Uy && !sup.Rz) result.Add($"{s}: support at '{sup.NodeLabel}' restrains nothing.");
+            }
+
+            foreach (var lcLabel in st.LoadCases)
+            {
+                if (!loadCaseLabels.Contains(lcLabel)) { result.Add($"{s}: unknown load case '{lcLabel}'."); continue; }
+                if (!applied.Add(lcLabel)) result.Add($"{s}: load case '{lcLabel}' is applied more than once.");
+                foreach (var l in loadCases[lcLabel].ElementLoads)
+                    if (!active.Contains(l.ElementLabel))
+                        result.Add($"{s}: load case '{lcLabel}' loads element '{l.ElementLabel}', which is not active.");
+            }
+
+            foreach (var ps in st.Prestress)
+            {
+                if (!allElements.Contains(ps.ElementLabel)) { result.Add($"{s}: prestress of unknown element '{ps.ElementLabel}'."); continue; }
+                if (!active.Contains(ps.ElementLabel))
+                    result.Add($"{s}: prestressed element '{ps.ElementLabel}' is not active.");
+                if (!sectionOf.TryGetValue(ps.ElementLabel, out var sec) || !materialOfSection.TryGetValue(sec, out var mat)
+                    || !steelMaterials.Contains(mat))
+                    result.Add($"{s}: prestressed element '{ps.ElementLabel}' must have a Steel section.");
+                if (ps.StressStart <= 0 || ps.StressEnd <= 0)
+                    result.Add($"{s}: prestress of '{ps.ElementLabel}' must be greater than 0.");
+            }
+        }
+        foreach (var e in allElements)
+            if (!everActive.Contains(e)) result.Add($"{p}: element '{e}' is never activated.");
     }
 }

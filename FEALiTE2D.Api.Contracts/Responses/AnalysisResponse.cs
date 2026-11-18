@@ -10,6 +10,9 @@ public sealed class AnalysisResponse
     public Dictionary<string, CaseResultDto> LoadCaseResults { get; set; } = new();
     public Dictionary<string, CaseResultDto> LoadCombinationResults { get; set; } = new();
 
+    /// <summary>Results of the time-dependent solver (TDA) for <c>AnalysisRequest.TimeDependent</c>; null from FEALiTE2D.</summary>
+    public TimeDependentResultsDto? TimeDependentResults { get; set; }
+
     public static AnalysisResponse Failed(params string[] errors) => new()
     {
         Status = AnalysisStatusDto.Failure,

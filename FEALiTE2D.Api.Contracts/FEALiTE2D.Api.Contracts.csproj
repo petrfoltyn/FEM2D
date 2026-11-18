@@ -8,8 +8,8 @@
 		<Description>Data transfer objects (DTOs), JSON contracts and mapping for the FEALiTE2D HTTP API.</Description>
 		<PackageTags>fealite2d api dto contracts json structural-analysis</PackageTags>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>0.1.0</Version>
-		<PackageReleaseNotes>Initial API contracts: request/response DTOs, structure builder, result mapper, validator.</PackageReleaseNotes>
+		<Version>0.3.0</Version>
+		<PackageReleaseNotes>0.3.0: results of the time-dependent solver — AnalysisResponse.TimeDependentResults (states in time, effects of stages and of creep and shrinkage, time histories), CaseResultDto.PartForces (parts of a composite member: girder, slab, tendons). 0.2.0: optional AnalysisRequest.TimeDependent (construction stages, creep and shrinkage of concrete, element eccentricities, TDA-only tendons and composite slab, prestress, time axis) for a time-dependent solver over the same structure; FEALiTE2D ignores it. 0.1.0: initial API contracts.</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>

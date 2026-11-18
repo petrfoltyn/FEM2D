@@ -25,6 +25,7 @@
     <ProjectReference Include="..\FEALiTE2D.Api.Contracts\FEALiTE2D.Api.Contracts.csproj" />
     <ProjectReference Include="..\FEALiTE2D.Api\FEALiTE2D.Api.csproj" />
     <ProjectReference Include="..\FEALiTE2D.Client\FEALiTE2D.Client.csproj" />
+    <ProjectReference Include="..\FEALiTE2D.Tda\FEALiTE2D.Tda.csproj" />
   </ItemGroup>
 
 </Project>

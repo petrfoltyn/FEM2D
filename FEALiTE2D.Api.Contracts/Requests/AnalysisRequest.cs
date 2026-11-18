@@ -11,4 +11,10 @@ public sealed class AnalysisRequest
     public List<LoadCaseDto> LoadCases { get; set; } = new();
     public List<LoadCombinationDto> LoadCombinations { get; set; } = new();
     public SettingsDto? Settings { get; set; }
+
+    /// <summary>
+    /// Optional time-dependent data (stages, creep, shrinkage) for a time-dependent solver over the same structure.
+    /// FEALiTE2D itself ignores it and computes the instantaneous response at 28 days.
+    /// </summary>
+    public TimeDependentDto? TimeDependent { get; set; }
 }
